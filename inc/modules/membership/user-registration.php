@@ -42,12 +42,19 @@ class TFC_User_Registration {
 					'role' => 'subscriber'
 				) );
 
-				// Optionally, send an email to the new user with their login details
-				wp_mail(
-					$email,
-					'Welcome to Our Website',
-					"Your account has been created. You can log in using the following credentials:\nUsername: $email\nPassword: $password"
-				);
+				// Send the default WordPress user notification email
+				if ( !function_exists('wp_new_user_notification') ) {
+					require_once( ABSPATH . 'wp-includes/pluggable.php' );
+				}
+
+				wp_new_user_notification( $user_id, null, 'user' );
+
+				// // Optionally, send an email to the new user with their login details
+				// wp_mail(
+				// 	$email,
+				// 	'Welcome to Our Website',
+				// 	"Your account has been created. You can log in using the following credentials:\nUsername: $email\nPassword: $password"
+				// );
 
 				// Log successful user creation
 				error_log( "User created successfully with ID: $user_id" );
