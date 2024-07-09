@@ -56,68 +56,58 @@ class TFC_User_Account {
 
 	public function user_account_shortcode() {
 		if ( ! is_user_logged_in() ) {
-			return '<p>' . __( 'You need to be logged in to update your account.', 'textdomain' ) . '</p>';
+			return '<p>You need to be logged in to update your account details.</p>';
 		}
 
-		$user = wp_get_current_user();
+		$current_user = wp_get_current_user();
 
-		error_log( "user\n" . print_r( $user, true ) . "\n" );
+		$message = '';
+
+		if ( isset( $_POST['user_account_nonce'] ) && wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['user_account_nonce'] ) ), 'update_user_account' ) ) {
+			$first_name = isset( $_POST['first_name'] ) ? sanitize_text_field( wp_unslash( $_POST['first_name'] ) ) : '';
+			$last_name  = isset( $_POST['last_name'] ) ? sanitize_text_field( wp_unslash( $_POST['last_name'] ) ) : '';
+			$phone      = isset( $_POST['phone'] ) ? sanitize_text_field( wp_unslash( $_POST['phone'] ) ) : '';
+
+			wp_update_user( array(
+				'ID'         => $current_user->ID,
+				'first_name' => $first_name,
+				'last_name'  => $last_name,
+			) );
+
+			update_user_meta( $current_user->ID, 'phone', $phone );
+
+			$message = '<p>Account details updated successfully.</p>';
+		}
 
 		ob_start();
 		?>
-
-		<form method="post">
-			<?php wp_nonce_field( 'update_user_account', 'user_account_nonce' ); ?>
+		<?php if ( $message ) : ?>
+			<div class="notice notice-success">
+				<?php echo $message; ?>
+			</div>
+		<?php endif; ?>
+		<form method="post" action="">
 			<p>
-					<label for="first_name"><?php esc_html_e( 'First Name', 'textdomain' ); ?></label>
-					<input type="text" id="first_name" name="first_name" value="<?php echo esc_attr( $user->first_name ); ?>" />
+				<label for="first_name">First Name:</label>
+				<input type="text" id="first_name" name="first_name" value="<?php echo esc_attr( $current_user->first_name ); ?>" />
 			</p>
 			<p>
-					<label for="last_name"><?php esc_html_e( 'Last Name', 'textdomain' ); ?></label>
-					<input type="text" id="last_name" name="last_name" value="<?php echo esc_attr( $user->last_name ); ?>" />
+				<label for="last_name">Last Name:</label>
+				<input type="text" id="last_name" name="last_name" value="<?php echo esc_attr( $current_user->last_name ); ?>" />
 			</p>
 			<p>
-					<label for="phone"><?php esc_html_e( 'Phone Number', 'textdomain' ); ?></label>
-					<input type="text" id="phone" name="phone" value="<?php echo esc_attr( get_user_meta( $user->ID, 'phone', true ) ); ?>" />
+				<label for="phone">Phone Number:</label>
+				<input type="text" id="phone" name="phone" value="<?php echo esc_attr( get_user_meta( $current_user->ID, 'phone', true ) ); ?>" />
 			</p>
 			<p>
-					<button type="submit" name="user_account_submit"><?php esc_html_e( 'Update Account', 'textdomain' ); ?></button>
+				<?php wp_nonce_field( 'update_user_account', 'user_account_nonce' ); ?>
+				<input type="submit" value="Update" />
 			</p>
 		</form>
-
 		<?php
-		if ( isset( $_POST['user_account_submit'] ) ) {
-			$this->process_user_account_form();
-		}
-
 		return ob_get_clean();
 	}
-
-	public function process_user_account_form() {
-		if ( ! is_user_logged_in() ) {
-			return;
-		}
-
-		if ( isset( $_POST['user_account_nonce'] ) && wp_verify_nonce( $_POST['user_account_nonce'], 'update_user_account' ) ) {
-			$user_id = get_current_user_id();
-
-			if ( isset( $_POST['first_name'] ) && ! empty( $_POST['first_name'] ) ) {
-				update_user_meta( $user_id, 'first_name', sanitize_text_field( wp_unslash( $_POST['first_name'] ) ) );
-			}
-
-			if ( isset( $_POST['last_name'] ) && ! empty( $_POST['last_name'] ) ) {
-				update_user_meta( $user_id, 'last_name', sanitize_text_field( wp_unslash( $_POST['last_name'] ) ) );
-			}
-
-			if ( isset( $_POST['phone'] ) && ! empty( $_POST['phone'] ) ) {
-				update_user_meta( $user_id, 'phone', sanitize_text_field( wp_unslash( $_POST['phone'] ) ) );
-			}
-
-			echo '<p>' . __( 'Your account has been updated.', 'textdomain' ) . '</p>';
-		} else {
-			echo '<p>' . __( 'There was an error with your submission. Please try again.', 'textdomain' ) . '</p>';
-		}
-	}
+  
 
 }
 new TFC_User_Account();
