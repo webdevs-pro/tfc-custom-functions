@@ -26,3 +26,4 @@ class TFC_User_Registration {
 		error_log( "parameters\n" . print_r( $parameters, true ) . "\n" );
 	}
 }
+new TFC_User_Registration();
