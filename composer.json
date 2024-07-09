@@ -1,0 +1,14 @@
+{
+	"repositories": [
+		{
+			"type": "vcs",
+			"url": "https://github.com/YahnisElsts/plugin-update-checker.git"
+		}
+	],
+	"require": {
+		"yahnis-elsts/plugin-update-checker": "dev-master"
+	},
+	"config": {
+		"vendor-dir": "inc/vendor"
+	}
+}
