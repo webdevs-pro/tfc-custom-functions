@@ -12,6 +12,8 @@ class TFC_User_Account {
 	}
 
 	public function redirect_subscribers_to_account( $user_login, $user ) {
+      error_log( "user\n" . print_r( $user, true ) . "\n" );
+
 		if ( in_array( 'subscriber', (array) $user->roles, true ) ) {
 			wp_redirect( home_url( '/account' ) );
 			exit;
@@ -27,3 +29,4 @@ class TFC_User_Account {
 	}
 
 }
+new TFC_User_Account();
