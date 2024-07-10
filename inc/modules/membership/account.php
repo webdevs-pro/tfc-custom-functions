@@ -178,6 +178,11 @@ class TFC_User_Account {
 				<h3>Edit Profile</h3>
 
 				<div class="profile-fields">
+					<p style="grid-column: 1 / -1">
+						<label for="first_name">Email</label>
+						<input type="text" id="email" name="email" disabled value="<?php echo esc_attr( $current_user->user_email ); ?>" />
+					</p>
+
 					<p>
 						<label for="first_name">First Name</label>
 						<input type="text" id="first_name" name="first_name" value="<?php echo esc_attr( $current_user->first_name ); ?>" />
@@ -223,7 +228,7 @@ class TFC_User_Account {
 			#tfc-account .profile-fields {
 				display: grid;
 				grid-template-columns: 1fr 1fr;
-				gap: 20px 20px;
+				gap: 12px 24px;
 			}
 			#tfc-account input {
 				border: 1px solid #ECEDF2;
