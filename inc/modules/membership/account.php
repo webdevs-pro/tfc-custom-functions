@@ -15,6 +15,9 @@ class TFC_User_Account {
 		add_action( 'template_redirect', array( $this, 'handle_user_account_form_submission' ) );
 
 
+	  add_filter('nav_menu_item_title', array( $this, 'change_specific_menu_item_title' ), 10, 4 );
+
+
 		add_shortcode( 'tfc_account', array( $this, 'user_account_shortcode' ) );
 	}
 
@@ -44,6 +47,14 @@ class TFC_User_Account {
 			wp_redirect( home_url( '/' ) );
 			exit;
 		}
+	}
+
+	public function change_specific_menu_item_title($title, $item, $args, $depth) {
+		if ( is_user_logged_in() && $item->ID == 409 ) {
+			$current_user = wp_get_current_user();
+			return $current_user->display_name;
+		}
+		return $title;
 	}
 
 	function handle_user_account_form_submission() {
