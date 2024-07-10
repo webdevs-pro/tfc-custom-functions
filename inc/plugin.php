@@ -39,3 +39,31 @@ if ( ! function_exists( 'wp_password_change_notification' ) ) {
 		}
 	}
 }
+
+
+/**
+ * Shortcode to return the page/post title, with a personalized greeting on the Account page.
+ *
+ * @return string The page/post title or personalized greeting.
+ */
+add_shortcode( 'tfc-dynamic-page-title', 'tfc_dynamic_page_title' );
+function tfc_dynamic_page_title() {
+	// Get the current post/page title.
+	$title = get_the_title();
+
+	// Check if the user is logged in and if we are on the "Account" page.
+	if ( is_user_logged_in() && is_page( 'Account' ) ) {
+		$current_user = wp_get_current_user();
+		
+		// Check if the user has a first name set, otherwise use the display name.
+		if ( ! empty( $current_user->first_name ) ) {
+			$title = 'Hi, ' . esc_html( $current_user->first_name ) . '!';
+		} else {
+			$title = 'Hi, ' . esc_html( $current_user->display_name ) . '!';
+		}
+	}
+
+	return $title;
+}
+
+
