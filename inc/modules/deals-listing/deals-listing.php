@@ -113,19 +113,81 @@ class TFC_Deals_Listing {
 
 	public function deals_listing_item_button() {
 		global $post_counter;
-		
+
+		$current_user_id = get_current_user_id();
+		$post_id = get_the_ID();
 
 		ob_start();
 
-			echo $post_counter;
+			if ( $current_user_id ) {
+				$subscription_status = get_user_meta( $current_user_id, 'subscription_status', true );
+
+				if ( $subscription_status == 'active' ) {
+					$this->render_get_deal_button( $post_id );
+				} else if ( $post_counter >= 1 && $post_counter <= 3 ) {
+					$this->render_get_deal_button( $post_id );
+				} else {
+					$this->render_become_a_member_button( $post_id );
+				}
+
+			} else {
+				$this->render_become_a_member_button( $post_id );
+			}
+
+			?>
+			<style>
+				.tfc-loop-get-deal {
+					font-family: "Open Sans", Sans-serif;
+					font-size: 16px;
+					font-weight: 700;
+					border-radius: 8px 8px 8px 8px;
+					background-color: var( --e-global-color-accent );
+					color: #fff;
+					padding: 8px 24px;
+					transition: opacity 250ms;
+					display: inline-block;
+				}
+				.tfc-loop-get-deal:hover {
+					opacity: 0.8;
+					color: #fff;
+				}
+				.tfc-loop-subscribe {
+					font-family: "Open Sans", Sans-serif;
+					font-size: 16px;
+					font-weight: 700;
+					border-radius: 8px 8px 8px 8px;
+					background-color: #fff;
+					color: var( --e-global-color-accent );
+					padding: 8px 24px;
+					transition: opacity 250ms;
+					border: 1px solid var( --e-global-color-accent );
+					display: inline-block;
+				}
+				.tfc-loop-subscribe:hover {
+					opacity: 0.8;
+					color: var( --e-global-color-accent );
+				}
+			</style>
+			<?php
 
 		return ob_get_clean();
 	}
 
 
+	public function render_get_deal_button( $post_id ) {
+		$deal_url = get_post_meta( $post_id, 'skyscanner_deal_url', true );
+		echo '<a class="tfc-loop-get-deal" href="' . $deal_url . '" target="_blank" role="button">Get Deal</a>';
+	}
+
+
+	private function render_become_a_member_button( $post_id ) {
+		echo '<a class="tfc-loop-subscribe" href="/subscribe-london" role="button">Become a Member</a>';
+	}
+
+
 
 	public function deals_listing_item_image() {
-		$post_id = get_the_id();
+		$post_id = get_the_ID();
 		$destination_city = get_post_meta( $post_id, 'destination', true );
 
 		if ( function_exists( 'get_field' ) ) {
