@@ -188,21 +188,26 @@ class TFC_Deals_Listing {
 
 	public function deals_listing_item_image() {
 		$post_id = get_the_ID();
-		$destination_city = get_post_meta( $post_id, 'destination', true );
 
-		if ( function_exists( 'get_field' ) ) {
-			$thumbnails_repeater = get_field( 'deal_thumbnails', 'option' );
-		} else {
-			return '';
-		}
+		$image_id = get_post_thumbnail_id( $post_id );
 
-		$image_id = null;
+		if ( ! $image_id ) {
 
-		if ( is_array( $thumbnails_repeater ) && ! empty( $thumbnails_repeater ) ) {
-			foreach ( $thumbnails_repeater as $item ) {
-				if ( $item['destination_city'] == $destination_city ) {
-					$image_id = $item['thumbnail'];
-					break;
+			$destination_city = get_post_meta( $post_id, 'destination', true );
+
+			if ( function_exists( 'get_field' ) ) {
+				$thumbnails_repeater = get_field( 'deal_thumbnails', 'option' );
+			} else {
+				return '';
+			}
+
+
+			if ( is_array( $thumbnails_repeater ) && ! empty( $thumbnails_repeater ) ) {
+				foreach ( $thumbnails_repeater as $item ) {
+					if ( $item['destination_city'] == $destination_city ) {
+						$image_id = $item['thumbnail'];
+						break;
+					}
 				}
 			}
 		}
