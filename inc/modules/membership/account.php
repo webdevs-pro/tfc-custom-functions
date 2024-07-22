@@ -17,6 +17,7 @@ class TFC_User_Account {
 		add_filter( 'nav_menu_item_title', array( $this, 'change_specific_menu_item_title' ), 10, 4 );
 
 		add_shortcode( 'tfc_account', array( $this, 'user_account_shortcode' ) );
+		add_shortcode( 'tfc_logout', array( $this, 'logout_shortcode' ) );
 	}
 
 	public function redirect_subscribers_to_account( $user_login, $user ) {
@@ -288,7 +289,41 @@ class TFC_User_Account {
 	}
 
 	
-	
+	function logout_shortcode() {
+
+		ob_start();
+		// Check if the user is logged in
+		if ( is_user_logged_in() ) {
+			// Get the logout URL
+			$logout_url = wp_logout_url( home_url() );
+
+			// Create the logout button HTML
+			echo '<a href="' . esc_url( $logout_url ) . '" class="tfc-logout-button">Logout</a>';
+
+
+		} else {
+			echo '<p>You are not logged in.</p>';
+		}
+
+		?>
+		<style>
+			.tfc-logout-button {
+				background-color: #415BE7;
+				border-radius: 5px;
+				border: none;
+				color: #fff;
+				font-weight: bold;
+				padding: 8px 24px;
+			}
+			.tfc-logout-button:hover {
+				color: #fff;
+			}
+
+		</style>
+		<?php
+
+		return ob_get_clean();
+	}
 	
 
 	
