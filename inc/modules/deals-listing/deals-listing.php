@@ -16,6 +16,7 @@ class TFC_Deals_Listing {
 		add_shortcode( 'tfc_deals_listing_item_image', array( $this, 'deals_listing_item_image' ) );
 	}
 
+
 	public function deals_listing_shortcode() {
 
 		global $post_counter;
@@ -58,6 +59,20 @@ class TFC_Deals_Listing {
 		// Execute the query
 		$query = new WP_Query( $args );
 
+		$posts = $query->posts;
+
+		// Function to sort posts by 'tier'
+		usort( $query->posts, function( $a, $b ) {
+			$tier_a = get_post_meta( $a->ID, 'tier', true );
+			$tier_b = get_post_meta( $b->ID, 'tier', true );
+		
+			if ( $tier_a === $tier_b ) {
+				return 0;
+			}
+		
+			return ( $tier_a === 'free' ) ? -1 : 1;
+		} );
+
 		ob_start();
 
 		
@@ -68,6 +83,7 @@ class TFC_Deals_Listing {
 						$query->the_post();
 
 						if ( $post_counter === 1 ) {
+							// Output lopp CSS only once on page
 							echo \Elementor\Plugin::instance()->frontend->get_builder_content_for_display( $template_id, true );
 						} else {
 							echo \Elementor\Plugin::instance()->frontend->get_builder_content_for_display( $template_id, false );
@@ -120,11 +136,12 @@ class TFC_Deals_Listing {
 		ob_start();
 
 			if ( $current_user_id ) {
-				$subscription_status = get_user_meta( $current_user_id, 'subscription_status', true );
+				$subscription_status = get_user_meta( $current_user_id, 'subscription', true );
+				$deal_type = get_post_meta( $post_id, 'tier', true );
 
 				if ( $subscription_status == 'active' ) {
 					$this->render_get_deal_button( $post_id );
-				} else if ( $post_counter >= 1 && $post_counter <= 3 ) {
+				} else if ( $deal_type == 'free' ) {
 					$this->render_get_deal_button( $post_id );
 				} else {
 					$this->render_become_a_member_button( $post_id );
