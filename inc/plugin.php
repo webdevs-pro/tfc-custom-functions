@@ -70,18 +70,27 @@ function tfc_dynamic_page_title() {
 
 
 /**
- * Function to perform actions after user meta is updated.
+ * Function to perform actions after user meta is updated, with debugging for array values.
  *
  * @param int    $meta_id     ID of the metadata entry.
  * @param int    $object_id   ID of the user object.
  * @param string $meta_key    Meta key.
  * @param mixed  $meta_value  Meta value.
  */
-function wpdocs_listen_update_user_meta( $meta_id, $object_id, $meta_key, $meta_value ) {
-	// You can add your custom code here.
-	// For example, log to a file, send an email, etc.
-	error_log( "Updated user meta for user {$object_id}: {$meta_key} = {$meta_value}" );
+function tfc_listen_update_user_meta( $meta_id, $object_id, $meta_key, $meta_value ) {
+	// Check if the meta value is an array.
+	if ( is_array( $meta_value ) ) {
+		 ob_start(); // Start buffering to capture output
+		 print_r( $meta_value );
+		 $output = ob_get_clean(); // Get the output and clean buffer
+
+		 // You can log this output to a file or handle it as needed
+		 error_log( "Updated user meta for user {$object_id}: {$meta_key} = {$output}" );
+	} else {
+		 // Handle non-array meta values normally.
+		 error_log( "Updated user meta for user {$object_id}: {$meta_key} = {$meta_value}" );
+	}
 }
 
 // Hook into update_user_meta.
-add_action( 'update_user_meta', 'wpdocs_listen_update_user_meta', 10, 4 );
+add_action( 'update_user_meta', 'tfc_listen_update_user_meta', 10, 4 );
