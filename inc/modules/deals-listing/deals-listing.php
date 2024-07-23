@@ -144,7 +144,7 @@ class TFC_Deals_Listing {
 				} else if ( $deal_type == 'free' ) {
 					$this->render_get_deal_button( $post_id );
 				} else {
-					$this->render_become_a_member_button( $post_id );
+					$this->render_become_a_premium_member_button( $post_id );
 				}
 
 			} else {
@@ -199,6 +199,11 @@ class TFC_Deals_Listing {
 
 	private function render_become_a_member_button( $post_id ) {
 		echo '<a class="tfc-loop-subscribe" href="/subscribe-london" role="button">Become a Member</a>';
+	}
+
+
+	private function render_become_a_premium_member_button( $post_id ) {
+		echo '<a class="tfc-loop-subscribe" href="/subscribe" role="button">Become a Premium Member</a>';
 	}
 
 

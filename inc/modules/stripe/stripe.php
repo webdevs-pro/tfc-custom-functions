@@ -104,7 +104,7 @@ class TFC_Stripe {
 			</div>
 
 			<div class="subscription-buttons">
-				<a href="https://billing.stripe.com/p/login/test_14k5la9bf1j40mc8ww" id="manage-subscription">Manage Sunscription</a>
+				<a href="https://billing.stripe.com/p/login/test_14k5la9bf1j40mc8ww" id="manage-subscription">Manage Subscription</a>
 				<a href="https://billing.stripe.com/p/login/test_14k5la9bf1j40mc8ww" id="cancel-subscription">Cancel Plan</a>
 			</div>
 		</div>
