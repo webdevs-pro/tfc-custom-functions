@@ -8,7 +8,7 @@ class TFC_Stripe {
 
 
 	public function __construct() {
-		add_action( 'rest_api_init', array( $this, 'register_rest_route' ) );
+		// add_action( 'rest_api_init', array( $this, 'register_rest_route' ) );
 		add_action( 'acf/render_field/name=subscription', array( $this, 'after_subscription_field' ), 20, 1 );
 		add_shortcode( 'tfc_subscription', array( $this, 'subscription_shortcode' ) );
 	}

@@ -67,3 +67,21 @@ function tfc_dynamic_page_title() {
 
 	return $title;
 }
+
+
+/**
+ * Function to perform actions after user meta is updated.
+ *
+ * @param int    $meta_id     ID of the metadata entry.
+ * @param int    $object_id   ID of the user object.
+ * @param string $meta_key    Meta key.
+ * @param mixed  $meta_value  Meta value.
+ */
+function wpdocs_listen_update_user_meta( $meta_id, $object_id, $meta_key, $meta_value ) {
+	// You can add your custom code here.
+	// For example, log to a file, send an email, etc.
+	error_log( "Updated user meta for user {$object_id}: {$meta_key} = {$meta_value}" );
+}
+
+// Hook into update_user_meta.
+add_action( 'update_user_meta', 'wpdocs_listen_update_user_meta', 10, 4 );
