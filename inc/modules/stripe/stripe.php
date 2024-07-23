@@ -60,6 +60,7 @@ class TFC_Stripe {
 
 		$plan_json = get_user_meta( $current_user->ID, 'plan_json', true );
 		$subscription = get_user_meta( $current_user->ID, 'stripe_event', true );
+		$subscription_status = get_user_meta( $current_user->ID, 'subscription', true );
 
 		$current_plan_name = 'Unsubscribed';
 		if ( is_array( $plan_json ) && isset( $plan_json['name'] ) ) {
@@ -98,14 +99,20 @@ class TFC_Stripe {
 				</div>
 
 				<div class="subscription-next-payment">
-					<div class="subscription-info-label"><?php echo $next_payment_label; ?></div>
-					<div class="subscription-info-value"><?php echo $next_payment_date; ?></div>
+					<?php if ( $subscription_status == 'active' ) { ?>
+						<div class="subscription-info-label"><?php echo $next_payment_label; ?></div>
+						<div class="subscription-info-value"><?php echo $next_payment_date; ?></div>
+					<?php } ?>
 				</div>
 			</div>
 
 			<div class="subscription-buttons">
-				<a href="https://billing.stripe.com/p/login/test_14k5la9bf1j40mc8ww" id="manage-subscription">Manage Subscription</a>
-				<a href="https://billing.stripe.com/p/login/test_14k5la9bf1j40mc8ww" id="cancel-subscription">Cancel Plan</a>
+				<?php if ( ! $subscription ) { ?>
+					<a href="/subscribe" id="manage-subscription">Become a Premium Member</a>
+				<?php } else { ?>
+					<a href="https://billing.stripe.com/p/login/test_14k5la9bf1j40mc8ww" id="manage-subscription">Manage Subscription</a>
+					<a href="https://billing.stripe.com/p/login/test_14k5la9bf1j40mc8ww" id="cancel-subscription">Cancel Plan</a>
+				<?php } ?>
 			</div>
 		</div>
 
