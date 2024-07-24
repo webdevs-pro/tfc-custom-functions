@@ -116,7 +116,7 @@ class TFC_Stripe {
 						<a href="https://billing.stripe.com/p/login/test_14k5la9bf1j40mc8ww" id="manage-subscription">Manage Subscription</a>
 						<a href="https://billing.stripe.com/p/login/test_14k5la9bf1j40mc8ww" id="cancel-subscription">Cancel Plan</a>
 					<?php } else if ( $subscription && $subscription_status != 'active' ) { ?>
-						<a href="https://billing.stripe.com/p/login/test_14k5la9bf1j40mc8ww" id="manage-subscription">Become a Premium Member</a>
+						<a href="/subscribe" id="manage-subscription">Become a Premium Member</a>
 					<?php } ?>
 				<?php } ?>
 			</div>
