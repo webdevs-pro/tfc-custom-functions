@@ -80,15 +80,32 @@ function tfc_dynamic_page_title() {
 function tfc_listen_update_user_meta( $meta_id, $object_id, $meta_key, $meta_value ) {
 	// Check if the meta value is an array.
 	if ( is_array( $meta_value ) ) {
-		 ob_start(); // Start buffering to capture output
-		 print_r( $meta_value );
-		 $output = ob_get_clean(); // Get the output and clean buffer
+		ob_start(); // Start buffering to capture output
+		print_r( $meta_value );
+		$output = ob_get_clean(); // Get the output and clean buffer
 
-		 // You can log this output to a file or handle it as needed
-		 error_log( "Updated user meta for user {$object_id}: {$meta_key} = {$output}" );
+		// You can log this output to a file or handle it as needed
+		error_log( "Updated user meta for user {$object_id}: {$meta_key} = {$output}" );
 	} else {
-		 // Handle non-array meta values normally.
-		 error_log( "Updated user meta for user {$object_id}: {$meta_key} = {$meta_value}" );
+		// Handle non-array meta values normally.
+		error_log( "Updated user meta for user {$object_id}: {$meta_key} = {$meta_value}" );
+	}
+
+	if ( $meta_key == 'stripe_username' ) {
+		$user = get_userdata( $object_id );
+
+		$email = $user->user_email;
+		$nickname = $user->nickname;
+
+		if ( $meta_value && $email == $nickname ) {
+			$user_data = array(
+				'ID'       => $object_id,
+				'nickname' => $meta_value,
+			);
+	 
+			// Update the user.
+			wp_update_user( $user_data );
+		}
 	}
 }
 
