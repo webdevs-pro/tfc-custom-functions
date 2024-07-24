@@ -60,6 +60,7 @@ class TFC_Deals_Listing {
 		$query = new WP_Query( $args );
 
 		$posts = $query->posts;
+		error_log( "posts\n" . print_r( $posts, true ) . "\n" );
 
 		// Function to sort posts by 'tier'
 		usort( $query->posts, function( $a, $b ) {

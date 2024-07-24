@@ -81,13 +81,11 @@ class TFC_User_Account {
 			$current_user = wp_get_current_user();
 			$errors = [];
 	
-			$first_name = isset( $_POST['first_name'] ) ? sanitize_text_field( wp_unslash( $_POST['first_name'] ) ) : '';
-			$last_name = isset( $_POST['last_name'] ) ? sanitize_text_field( wp_unslash( $_POST['last_name'] ) ) : '';
+			$nickname = isset( $_POST['full_name'] ) ? sanitize_text_field( wp_unslash( $_POST['first_name'] ) ) : '';
 	
 			wp_update_user( array(
 				'ID' => $current_user->ID,
-				'first_name' => $first_name,
-				'last_name' => $last_name,
+				'nickname' => $nickname,
 			) );
 
 	
@@ -185,13 +183,8 @@ class TFC_User_Account {
 					</p>
 
 					<p>
-						<label for="first_name">First Name</label>
-						<input type="text" id="first_name" name="first_name" value="<?php echo esc_attr( $current_user->first_name ); ?>" />
-					</p>
-
-					<p>
-						<label for="last_name">Last Name</label>
-						<input type="text" id="last_name" name="last_name" value="<?php echo esc_attr( $current_user->last_name ); ?>" />
+						<label for="first_name">Full Name</label>
+						<input type="text" id="full_name" name="full_name" value="<?php echo esc_attr( $current_user->nickname ); ?>" />
 					</p>
 				</div>
 
@@ -228,7 +221,7 @@ class TFC_User_Account {
 			}
 			#tfc-account .profile-fields {
 				display: grid;
-				grid-template-columns: 1fr 1fr;
+				grid-template-columns: 1fr;
 				gap: 12px 24px;
 			}
 			#tfc-account input {

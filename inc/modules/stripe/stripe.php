@@ -61,14 +61,19 @@ class TFC_Stripe {
 		$plan_json = get_user_meta( $current_user->ID, 'plan_json', true );
 		$subscription = get_user_meta( $current_user->ID, 'stripe_event', true );
 		$subscription_status = get_user_meta( $current_user->ID, 'subscription', true );
-
-		$current_plan_name = 'Unsubscribed';
-		if ( is_array( $plan_json ) && isset( $plan_json['name'] ) ) {
-			$current_plan_name = $plan_json['name'] ?? '';
-		}
-
 		$next_payment_label = 'Next Payment';
 		$next_payment_timestamp = $subscription['current_period_end'] ?? '';
+
+
+		$current_plan_name = 'Free';
+		if ( is_array( $plan_json ) && isset( $plan_json['name'] ) && $subscription_status == 'active' ) {
+			$current_plan_name = $plan_json['name'] ?? '';
+			if ( is_array( $subscription ) && isset( $subscription['canceled_at'] ) && ! empty( $subscription['canceled_at'] ) ) {
+				$current_plan_name .= ' (Canceled)';
+				$next_payment_label = 'Active until';
+			}
+		}
+
 
 		if ( ! empty( $next_payment_timestamp ) && is_numeric( $next_payment_timestamp ) ) {
 			$next_payment_date = date( 'F j, Y', $subscription['current_period_end'] );
@@ -76,10 +81,7 @@ class TFC_Stripe {
 			$next_payment_date = 'N/A';
 		}
 
-		if ( is_array( $subscription ) && isset( $subscription['canceled_at'] ) && ! empty( $subscription['canceled_at'] ) ) {
-			$current_plan_name .= ' (Canceled)';
-			$next_payment_label = 'Active until';
-		}
+
 
 
 
@@ -110,8 +112,12 @@ class TFC_Stripe {
 				<?php if ( ! $subscription ) { ?>
 					<a href="/subscribe" id="manage-subscription">Become a Premium Member</a>
 				<?php } else { ?>
-					<a href="https://billing.stripe.com/p/login/test_14k5la9bf1j40mc8ww" id="manage-subscription">Manage Subscription</a>
-					<a href="https://billing.stripe.com/p/login/test_14k5la9bf1j40mc8ww" id="cancel-subscription">Cancel Plan</a>
+					<?php if ( $subscription_status == 'active' ) { ?>
+						<a href="https://billing.stripe.com/p/login/test_14k5la9bf1j40mc8ww" id="manage-subscription">Manage Subscription</a>
+						<a href="https://billing.stripe.com/p/login/test_14k5la9bf1j40mc8ww" id="cancel-subscription">Cancel Plan</a>
+					<?php } else if ( $subscription && $subscription_status != 'active' ) { ?>
+						<a href="https://billing.stripe.com/p/login/test_14k5la9bf1j40mc8ww" id="manage-subscription">Become a Premium Member</a>
+					<?php } ?>
 				<?php } ?>
 			</div>
 		</div>
