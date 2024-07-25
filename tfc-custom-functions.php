@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Toms Flight Club Custom Functions
  * Plugin URI: https://github.com/webdevs-pro/tfc-custom-functions
- * Version: 1.30
+ * Version: 1.31
  * Description: A place for custom functions for tomsflightclub.com website
  * Author: Alex Ishchenko
  * Author URI: https://website.cv.ua
