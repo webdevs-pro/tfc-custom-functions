@@ -33,13 +33,13 @@ class TFC_Deals_Listing {
 		$args = array(
 			'post_type' => 'deal',
 			'posts_per_page' => 9,
-			'meta_query' => array(
-				array(
-					'key' => 'deal_found_on',
-					'value' => $current_date,
-					'compare' => '='
-				)
-			)
+			// 'meta_query' => array(
+			// 	array(
+			// 		'key' => 'deal_found_on',
+			// 		'value' => $current_date,
+			// 		'compare' => '='
+			// 	)
+			// )
 		);
 
 		
@@ -60,7 +60,6 @@ class TFC_Deals_Listing {
 		$query = new WP_Query( $args );
 
 		$posts = $query->posts;
-		error_log( "posts\n" . print_r( $posts, true ) . "\n" );
 
 		// Function to sort posts by 'tier'
 		usort( $query->posts, function( $a, $b ) {
@@ -185,6 +184,11 @@ class TFC_Deals_Listing {
 					opacity: 0.8;
 					color: var( --e-global-color-accent );
 				}
+				.tfc-loop-deal-dates {
+					font-family: "Open Sans", Sans-serif;
+					font-size: 15px;
+					font-weight: 600;
+				}
 			</style>
 			<?php
 
@@ -193,6 +197,18 @@ class TFC_Deals_Listing {
 
 
 	public function render_get_deal_button( $post_id ) {
+
+		// Render dates first
+		$outbound_date = get_post_meta( $post_id, 'outbound_date', true );
+		$return_date = get_post_meta( $post_id, 'return_date', true );
+
+		$outbound_timestamp = strtotime( $outbound_date );
+		$return_timestamp = strtotime( $return_date );
+
+		$date_format = 'j M';
+
+		echo '<p class="tfc-loop-deal-dates">' . date_i18n( $date_format, $outbound_timestamp ) . ' - ' . date_i18n( $date_format, $return_timestamp ) . '</p>';
+
 		$deal_url = get_post_meta( $post_id, 'skyscanner_deal_url', true );
 		echo '<a class="tfc-loop-get-deal" href="' . $deal_url . '" target="_blank" role="button">Get Deal</a>';
 	}

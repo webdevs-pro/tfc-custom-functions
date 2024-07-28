@@ -117,7 +117,11 @@ add_action( 'update_user_meta', 'tfc_listen_update_user_meta', 10, 4 );
 
 
 
-
+/**
+ * Shortcode to display social icon based on the social network meta field.
+ *
+ * @return string The HTML content for the social icon.
+ */
 add_shortcode( 'tfc-review-social-icon', 'tfc_review_social_icon' );
 function tfc_review_social_icon() {
 	ob_start();
