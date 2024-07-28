@@ -11,6 +11,8 @@ class TFC_Stripe {
 		// add_action( 'rest_api_init', array( $this, 'register_rest_route' ) );
 		add_action( 'acf/render_field/name=subscription', array( $this, 'after_subscription_field' ), 20, 1 );
 		add_shortcode( 'tfc_subscription', array( $this, 'subscription_shortcode' ) );
+		add_shortcode( 'stripe_url', array( $this, 'generate_stripe_url_with_email' ) );
+
 	}
 
 	public function register_rest_route() {
@@ -177,6 +179,56 @@ class TFC_Stripe {
 		</style>
 		<?php
 		return ob_get_clean();
+	}
+
+	/**
+	 * Shortcode to generate a Stripe URL with prefilled email.
+	 *
+	 * @param array $atts Shortcode attributes.
+	 * @return string The generated URL with prefilled email.
+	 */
+	public function generate_stripe_url_with_email( $atts ) {
+		// Extract attributes with defaults
+		$atts = shortcode_atts(
+			array(
+				'plan' => '',
+			), $atts, 'stripe_url'
+		);
+
+		// Map plan attribute to ACF field name
+		$plan_to_field = array(
+			'3 month' => '3_months_plan_url',
+			'6 month' => '6_months_plan_url',
+			'yearly'  => 'yearly_plan_url',
+		);
+
+		// Get the plan URL from ACF options
+		if ( ! array_key_exists( $atts['plan'], $plan_to_field ) ) {
+			return ''; // Return empty if plan attribute is invalid
+		}
+
+		$field_name = $plan_to_field[ $atts['plan'] ];
+		$plan_url = get_field( $field_name, 'option' );
+
+		if ( ! $plan_url ) {
+			return ''; // Return empty if no URL is found
+		}
+
+		// Check if the user is logged in and get their email
+		$current_user = wp_get_current_user();
+		$email = '';
+
+		if ( is_user_logged_in() && isset( $current_user->user_email ) ) {
+			$email = sanitize_email( $current_user->user_email );
+		}
+
+		// Generate the URL with the prefilled email if available
+		if ( $email ) {
+			$plan_url = add_query_arg( 'prefilled_email', $email, $plan_url );
+		}
+
+		// Return the URL
+		return esc_url( $plan_url );
 	}
 
 }
