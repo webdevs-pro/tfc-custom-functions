@@ -10,6 +10,20 @@ class ComposerStaticInit25594c74f49913121c957fc07da84253
         'd05ecc14ff93fd612a81ec7e8ab4c2c9' => __DIR__ . '/..' . '/yahnis-elsts/plugin-update-checker/load-v5p4.php',
     );
 
+    public static $prefixLengthsPsr4 = array (
+        'S' => 
+        array (
+            'Stripe\\' => 7,
+        ),
+    );
+
+    public static $prefixDirsPsr4 = array (
+        'Stripe\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/stripe/stripe-php/lib',
+        ),
+    );
+
     public static $classMap = array (
         'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
     );
@@ -17,6 +31,8 @@ class ComposerStaticInit25594c74f49913121c957fc07da84253
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
+            $loader->prefixLengthsPsr4 = ComposerStaticInit25594c74f49913121c957fc07da84253::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit25594c74f49913121c957fc07da84253::$prefixDirsPsr4;
             $loader->classMap = ComposerStaticInit25594c74f49913121c957fc07da84253::$classMap;
 
         }, null, ClassLoader::class);

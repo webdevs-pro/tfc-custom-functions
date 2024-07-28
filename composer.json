@@ -6,7 +6,8 @@
 		}
 	],
 	"require": {
-		"yahnis-elsts/plugin-update-checker": "dev-master"
+		"yahnis-elsts/plugin-update-checker": "dev-master",
+		"stripe/stripe-php": "^15.4"
 	},
 	"config": {
 		"vendor-dir": "inc/vendor"
