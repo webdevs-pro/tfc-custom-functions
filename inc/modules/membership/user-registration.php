@@ -43,8 +43,12 @@ class TFC_User_Registration {
 				) );
 
 				// Send the default WordPress user notification email
-				if ( !function_exists('wp_new_user_notification') ) {
+				if ( ! function_exists('wp_new_user_notification') ) {
 					require_once( ABSPATH . 'wp-includes/pluggable.php' );
+				}
+
+				if ( isset( $parameters['attributes']['CITY'] ) ) {
+					update_user_meta( $user_id, 'origin_city', sanitize_text_field( $parameters['attributes']['CITY'] ) );
 				}
 
 				wp_new_user_notification( $user_id, null, 'user' );

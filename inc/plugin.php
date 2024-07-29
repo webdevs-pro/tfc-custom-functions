@@ -77,11 +77,12 @@ function tfc_dynamic_page_title() {
  * @param string $meta_key    Meta key.
  * @param mixed  $meta_value  Meta value.
  */
+add_action( 'update_user_meta', 'tfc_listen_update_user_meta', 10, 4 );
 function tfc_listen_update_user_meta( $meta_id, $object_id, $meta_key, $meta_value ) {
 	// Check if the meta value is an array.
 	if ( is_array( $meta_value ) ) {
 		ob_start(); // Start buffering to capture output
-		print_r( $meta_value );
+			print_r( $meta_value );
 		$output = ob_get_clean(); // Get the output and clean buffer
 
 		// You can log this output to a file or handle it as needed
@@ -107,11 +108,65 @@ function tfc_listen_update_user_meta( $meta_id, $object_id, $meta_key, $meta_val
 			wp_update_user( $user_data );
 		}
 	}
+
+	if ( $meta_key == 'subscription' ) {
+		$user = get_userdata( $object_id );
+		$url = 'https://hook.eu2.make.com/ky7k4n1lpb7n9tvcqp4jfa1x1qdqclju';
+		$payload = array(
+			'email' => $user->user_email,
+		);
+
+		if ( $meta_value == 'active' ) {
+			$payload['subscription'] = 'paid';
+		} else {
+			$payload['subscription'] = 'free';
+		}
+
+
+		tfc_send_webhook_payload( $url, $payload );
+	}
+	
+
 }
 
-// Hook into update_user_meta.
-add_action( 'update_user_meta', 'tfc_listen_update_user_meta', 10, 4 );
 
+
+/**
+ * Sends a webhook payload.
+ *
+ * @param string $url The webhook URL.
+ * @param array  $payload The data to send.
+ * @return void
+ */
+function tfc_send_webhook_payload( $url, $payload ) {
+	// Ensure the URL is valid.
+	if ( ! filter_var( $url, FILTER_VALIDATE_URL ) ) {
+		return;
+	}
+
+	// Prepare the arguments for the request.
+	$args = array(
+		'body'        => wp_json_encode( $payload ),
+		'headers'     => array(
+			'Content-Type' => 'application/json',
+		),
+		'data_format' => 'body',
+		'timeout'     => 15,
+	);
+
+	// Send the POST request.
+	$response = wp_remote_post( $url, $args );
+
+	// Handle the response.
+	if ( is_wp_error( $response ) ) {
+		error_log( 'Webhook POST request failed: ' . $response->get_error_message() );
+	} else {
+		$status_code = wp_remote_retrieve_response_code( $response );
+		if ( 200 !== $status_code ) {
+				error_log( 'Webhook POST request returned status code: ' . $status_code );
+		}
+	}
+}
 
 
 
