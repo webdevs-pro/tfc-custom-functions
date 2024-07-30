@@ -11,14 +11,15 @@ $post_counter;
 class TFC_Deals_Listing {
 
 	public function __construct() {
-		add_shortcode( 'tfc_deals_listing', array( $this, 'deals_listing_shortcode' ) );
+		// add_shortcode( 'tfc_deals_listing', array( $this, 'deals_listing_shortcode' ) );
 		add_shortcode( 'tfc_deals_listing_item_button', array( $this, 'deals_listing_item_button' ) );
 		add_shortcode( 'tfc_deals_listing_item_image', array( $this, 'deals_listing_item_image' ) );
 		add_shortcode( 'tfc_deal_city_and_country', array( $this, 'deal_city_and_country' ) );
 		add_shortcode( 'tfc_deal_tags', array( $this, 'deal_tags' ) );
+		add_action( 'elementor/query/query_results', array( $this, 'loop_grid_deals_order_filter' ), 10, 2);
 	}
 
-
+/*
 	public function deals_listing_shortcode() {
 
 		global $post_counter;
@@ -61,7 +62,6 @@ class TFC_Deals_Listing {
 		// Execute the query
 		$query = new WP_Query( $args );
 
-		$posts = $query->posts;
 
 		// Function to sort posts by 'tier'
 		usort( $query->posts, function( $a, $b ) {
@@ -126,7 +126,7 @@ class TFC_Deals_Listing {
 
 		return ob_get_clean();
 	}
-
+*/
 
 
 	public function deals_listing_item_button() {
@@ -352,6 +352,34 @@ class TFC_Deals_Listing {
 			}
 
 		return ob_get_clean();
+	}
+
+
+
+	public function loop_grid_deals_order_filter( $query, $widget ) {
+
+		$settings = $widget->get_settings();
+		$query_id = $settings['post_query_query_id'];
+
+		if ( $query_id != 'deals_query' ) {
+			return $query;
+		}
+
+
+		// Function to sort posts by 'tier'
+		usort( $query->posts, function( $a, $b ) {
+			$tier_a = get_post_meta( $a->ID, 'tier', true );
+			$tier_b = get_post_meta( $b->ID, 'tier', true );
+		
+			if ( $tier_a === $tier_b ) {
+				return 0;
+			}
+		
+			return ( $tier_a === 'free' ) ? -1 : 1;
+		} );
+
+
+		return $query;
 	}
 
 }
