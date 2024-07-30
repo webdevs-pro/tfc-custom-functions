@@ -15,6 +15,7 @@ class TFC_Deals_Listing {
 		add_shortcode( 'tfc_deals_listing_item_button', array( $this, 'deals_listing_item_button' ) );
 		add_shortcode( 'tfc_deals_listing_item_image', array( $this, 'deals_listing_item_image' ) );
 		add_shortcode( 'tfc_deal_city_and_country', array( $this, 'deal_city_and_country' ) );
+		add_shortcode( 'tfc_deal_tags', array( $this, 'deal_tags' ) );
 	}
 
 
@@ -302,6 +303,51 @@ class TFC_Deals_Listing {
 				echo '&nbsp;';
 				echo '<span class="deal-destination-country">';
 					echo $country;
+				echo '</span>';
+			}
+
+		return ob_get_clean();
+	}
+
+
+
+	public function deal_tags() {
+		$post_id = get_the_ID();
+
+		$weekend_getaway = get_post_meta( $post_id, 'weekend_getaway', true );
+		$stops = get_post_meta( $post_id, 'stops', true );
+		
+		ob_start();
+
+			if ( $stops ) {
+				switch ( $stops ) {
+					case 'direct':
+						$stops_text = 'Direct Flight';
+						break;
+
+					case '1stop':
+						$stops_text = '1 Stop';
+						break;
+
+					case '2stops':
+						$stops_text = '2 Stops';
+						break;
+					
+					default:
+						$stops_text = '';
+						break;
+				}
+
+				if ( $stops_text ) {
+					echo '<span class="deal-stops-tag">';
+						echo $stops_text;
+					echo '</span>';
+				}
+			}
+
+			if ( $weekend_getaway == 'yes' ) {
+				echo '<span class="deal-weekend-getaway-tag">';
+					echo 'Weekend Getaway';
 				echo '</span>';
 			}
 
