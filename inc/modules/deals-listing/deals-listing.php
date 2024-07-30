@@ -14,6 +14,7 @@ class TFC_Deals_Listing {
 		add_shortcode( 'tfc_deals_listing', array( $this, 'deals_listing_shortcode' ) );
 		add_shortcode( 'tfc_deals_listing_item_button', array( $this, 'deals_listing_item_button' ) );
 		add_shortcode( 'tfc_deals_listing_item_image', array( $this, 'deals_listing_item_image' ) );
+		add_shortcode( 'tfc_deal_city_and_country', array( $this, 'deal_city_and_country' ) );
 	}
 
 
@@ -277,6 +278,32 @@ class TFC_Deals_Listing {
 				}
 			</style>
 			<?php
+
+		return ob_get_clean();
+	}
+
+
+
+	public function deal_city_and_country() {
+		$post_id = get_the_ID();
+
+		$city = get_post_meta( $post_id, 'destination', true );
+		$country = get_post_meta( $post_id, 'destination_country', true );
+		
+		ob_start();
+
+			if ( $city ) {
+				echo '<span class="deal-destination-city">';
+					echo $city;
+				echo '</span>';
+			}
+
+			if ( $country ) {
+				echo '&nbsp;';
+				echo '<span class="deal-destination-country">';
+					echo $country;
+				echo '</span>';
+			}
 
 		return ob_get_clean();
 	}
