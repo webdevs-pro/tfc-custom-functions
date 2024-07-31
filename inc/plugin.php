@@ -9,6 +9,7 @@ require_once ( TFC_PLUGIN_DIR . '/inc/modules/membership/user-registration.php' 
 require_once ( TFC_PLUGIN_DIR . '/inc/modules/membership/account.php' );
 require_once ( TFC_PLUGIN_DIR . '/inc/modules/deals-listing/deals-listing.php' );
 require_once ( TFC_PLUGIN_DIR . '/inc/modules/stripe/stripe.php' );
+require_once ( TFC_PLUGIN_DIR . '/inc/modules/email/email.php' );
 
 
 /**
