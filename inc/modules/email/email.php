@@ -12,15 +12,32 @@ class TFC_Email {
 	}
 
 	public function register_rest_route() {
-		// https://tomsflightclub.com/wp-json/tfc/v1/email
-		register_rest_route( 'tfc/v1', 'email', array(
+		// https://tomsflightclub.com/wp-json/tfc/v1/email_free
+		register_rest_route( 'tfc/v1', 'email_free', array(
 			'methods'             => 'POST',
-			'callback'            => array( $this, 'generate_email_template' ),
+			'callback'            => array( $this, 'generate_free_email_template' ),
+			'permission_callback' => '__return_true',
+		) );
+
+		// https://tomsflightclub.com/wp-json/tfc/v1/email_paid
+		register_rest_route( 'tfc/v1', 'email_paid', array(
+			'methods'             => 'POST',
+			'callback'            => array( $this, 'generate_paid_email_template' ),
 			'permission_callback' => '__return_true',
 		) );
 	}
 
-	public function generate_email_template( $request ) {
+	public function generate_free_email_template( $request ) {
+		error_log( "generate_free_email_template\n" );
+		$this->generate_email_template( $request, 'free' );
+	}
+
+	public function generate_paid_email_template( $request ) {
+		error_log( "generate_paid_email_template\n" );
+		$this->generate_email_template( $request, 'paid' );
+	}
+
+	public function generate_email_template( $request, $type ) {
 		$parameters = $request->get_params();
 
 		// error_log( "parameters\n" . print_r( $parameters[0]['Array'], true ) . "\n" );
@@ -34,7 +51,13 @@ class TFC_Email {
 		}
 
 		foreach ( $parameters[0]['Array'] as $index => $deal_data ) {
-			$this->get_table_row( $index, $deal_data );
+			if ( $type == 'paid' ) {
+				$this->get_table_row( $index, $deal_data, 'link_to_deal' );
+			} else if ( $type == 'free' && $index === 0 ) {
+				$this->get_table_row( $index, $deal_data, 'link_to_deal' );
+			} else {
+				$this->get_table_row( $index, $deal_data, 'subscribe_button' );
+			}
 		}
 
 		// Read and echo content from mail_start.html
@@ -45,9 +68,9 @@ class TFC_Email {
 
 		$html = ob_get_clean();
 
-		error_log( "html\n" . print_r( $html, true ) . "\n" );
+		// error_log( "html\n" . print_r( $html, true ) . "\n" );
 
-		$webhook_url = get_field( 'makecom_webhook_url', 'option' );
+		$webhook_url = get_field( 'makecom_webhook_url_' . $type, 'option' );
 
 		wp_remote_post( 
 			$webhook_url,
@@ -67,7 +90,7 @@ class TFC_Email {
 	}
 
 
-	private function get_table_row( $index, $deal_data ) {
+	private function get_table_row( $index, $deal_data, $button_type ) {
 		?>
 
 		<tr>
@@ -150,11 +173,11 @@ class TFC_Email {
 																<?php echo $deal_data['Currency and Price']; ?>
 															</td>
 															<td align="center" style="border-radius:10px; font-size: 20px;background-color: #415BE7;" bgcolor="#415BE7" >
-																<?php if ( $deal_data['Subscription Tier'] == 'free' ) { ?>
+																<?php if ( $button_type == 'link_to_deal' ) { ?>
 																	<a href="<?php echo $deal_data['Skyscanner Deal Link']; ?>" target="_blank" style="font-size: 14px;font-weight: normal;text-decoration: none;color: #ffffff;background-color: #415BE7;border:1px solid #263EC4;border-radius:10px;padding:10px 18px;display: inline-block; font-family: 'Inter', Arial, sans-serif;">
 																		Get Deal
 																	</a>
-																<?php } else if ( $deal_data['Subscription Tier'] == 'paid' ) { ?>
+																<?php } else if ( $button_type == 'subscribe_button' ) { ?>
 																	<a href="https://tomsflightclub.com/subscribe/" target="_blank" style="font-size: 14px;font-weight: normal;text-decoration: none;color: #ffffff;background-color: #415BE7;border:1px solid #263EC4;border-radius:10px;padding:10px 18px;display: inline-block; font-family: 'Inter', Arial, sans-serif;">
 																		Become a Premiunm Member
 																	</a>
