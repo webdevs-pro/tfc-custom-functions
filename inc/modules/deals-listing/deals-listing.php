@@ -199,17 +199,7 @@ class TFC_Deals_Listing {
 
 
 	public function render_get_deal_button( $post_id ) {
-
-		// Render dates first
-		$outbound_date = get_post_meta( $post_id, 'outbound_date', true );
-		$return_date = get_post_meta( $post_id, 'return_date', true );
-
-		$outbound_timestamp = strtotime( $outbound_date );
-		$return_timestamp = strtotime( $return_date );
-
-		$date_format = 'j M';
-
-		echo '<p class="tfc-loop-deal-dates">' . date_i18n( $date_format, $outbound_timestamp ) . ' - ' . date_i18n( $date_format, $return_timestamp ) . '</p>';
+		$this->render_deal_dates( $post_id );
 
 		$deal_url = get_post_meta( $post_id, 'skyscanner_deal_url', true );
 		echo '<a class="tfc-loop-get-deal" href="' . $deal_url . '" target="_blank" role="button">Get Deal</a>';
@@ -217,12 +207,27 @@ class TFC_Deals_Listing {
 
 
 	private function render_become_a_member_button( $post_id ) {
+		$this->render_deal_dates( $post_id );
+
 		echo '<a class="tfc-loop-subscribe" href="/subscribe-london" role="button">Become a Free Member</a>';
 	}
 
 
 	private function render_become_a_premium_member_button( $post_id ) {
+		$this->render_deal_dates( $post_id );
+		
 		echo '<a class="tfc-loop-subscribe" href="/subscribe" role="button">Become a Premium Member</a>';
+	}
+
+	private function render_deal_dates( $post_id ) {
+		$outbound_date = get_post_meta( $post_id, 'outbound_date', true );
+		$return_date = get_post_meta( $post_id, 'return_date', true );
+
+		$outbound_timestamp = strtotime( $outbound_date );
+		$return_timestamp = strtotime( $return_date );
+
+		$date_format = 'j M';
+		echo '<p class="tfc-loop-deal-dates">' . date_i18n( $date_format, $outbound_timestamp ) . ' - ' . date_i18n( $date_format, $return_timestamp ) . '</p>';
 	}
 
 
