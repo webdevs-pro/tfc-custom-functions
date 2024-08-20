@@ -6,7 +6,8 @@
 		}
 	],
 	"require": {
-		"yahnis-elsts/plugin-update-checker": "dev-master"
+		"yahnis-elsts/plugin-update-checker": "dev-master",
+		"getbrevo/brevo-php": "^1.0"
 	},
 	"config": {
 		"vendor-dir": "inc/vendor"
