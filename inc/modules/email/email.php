@@ -31,15 +31,15 @@ class TFC_Email {
 
 	public function generate_free_email_template( $request ) {
 		error_log( "generate_free_email_template\n" );
-
-		// $parameters = array(
-		// 	'Deals' => [], // Array of deals
-		// 	'Origin City' => [], // String origin city
-		// );
+		/*
+		// Parameters structure
+		$parameters = array(
+			'Deals' => [], // Array of deals
+			'Origin City' => [], // String origin city
+		);
+		*/
 
 		$parameters = $request->get_params();
-
-		$brevo = new TFC_Brevo_API;
 
 		$list_id = get_field( 'tfc_brevo_campaign_list_id', 'option' );
 		$origin_city = $parameters['Origin City'];
@@ -47,7 +47,8 @@ class TFC_Email {
 		$campaign_name = 'Test campaign ' . date("Y-m-d H:i:s");
 		$subject = 'Test deals ' . date("Y-m-d H:i:s");
 		$content = $this->get_email_body( $request, 'free' );
-
+		
+		$brevo = new TFC_Brevo_API;
 		$brevo->create_brevo_campaign( $list_id, $origin_city, $subscription_type, $campaign_name, $subject, $content );
 	}
 
