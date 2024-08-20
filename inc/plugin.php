@@ -8,6 +8,7 @@ require_once ( TFC_PLUGIN_DIR . '/inc/modules/elementor/elementor.php' );
 require_once ( TFC_PLUGIN_DIR . '/inc/modules/membership/user-registration.php' );
 require_once ( TFC_PLUGIN_DIR . '/inc/modules/membership/account.php' );
 require_once ( TFC_PLUGIN_DIR . '/inc/modules/deals-listing/deals-listing.php' );
+require_once ( TFC_PLUGIN_DIR . '/inc/modules/brevo/class-brevo-api.php' );
 require_once ( TFC_PLUGIN_DIR . '/inc/modules/stripe/stripe.php' );
 require_once ( TFC_PLUGIN_DIR . '/inc/modules/email/email.php' );
 
@@ -91,7 +92,7 @@ function tfc_listen_update_user_meta( $meta_id, $object_id, $meta_key, $meta_val
 	} else {
 		error_log( "Updated user meta for user {$object_id}: {$meta_key} = {$meta_value}" );
 	}
-	
+
 
 	if ( $meta_key == 'stripe_username' ) {
 		$user = get_userdata( $object_id );
@@ -110,21 +111,45 @@ function tfc_listen_update_user_meta( $meta_id, $object_id, $meta_key, $meta_val
 		}
 	}
 
-	if ( $meta_key == 'subscription' ) {
-		$user = get_userdata( $object_id );
-		$url = 'https://hook.eu2.make.com/ky7k4n1lpb7n9tvcqp4jfa1x1qdqclju';
-		$payload = array(
-			'email' => $user->user_email,
-		);
+	// if ( $meta_key == 'subscription' ) {
+	// 	$user = get_userdata( $object_id );
+	// 	$url = 'https://hook.eu2.make.com/ky7k4n1lpb7n9tvcqp4jfa1x1qdqclju';
+	// 	$payload = array(
+	// 		'email' => $user->user_email,
+	// 	);
 
-		if ( $meta_value == 'active' ) {
-			$payload['subscription'] = 'paid';
-		} else {
-			$payload['subscription'] = 'free';
+	// 	if ( $meta_value == 'active' ) {
+	// 		$payload['subscription'] = 'paid';
+	// 	} else {
+	// 		$payload['subscription'] = 'free';
+	// 	}
+
+
+	// 	tfc_send_webhook_payload( $url, $payload );
+	// }
+
+	if ( $meta_key == 'subscription' || $meta_key == 'origin_city' ) {
+		$user = get_userdata( $object_id );
+
+		$user_email = $user->user_email;
+
+		$data = array();
+
+		if ( $meta_key == 'subscription' ) {
+			if ( $meta_value == 'active' ) {
+				$data['attributes']['SUBSCRIPTION'] = 1; // Paid
+			} else {
+				$data['attributes']['SUBSCRIPTION'] = 2; // Free
+			}
 		}
 
+		if ( $meta_key == 'origin_city' ) {
+			$data['attributes']['CITY'] = sanitize_text_field( $meta_value );
+		}
 
-		tfc_send_webhook_payload( $url, $payload );
+		$brevo = new TFC_Brevo_API;
+
+		$brevo->update_contact( $user_email, $data );
 	}
 	
 
