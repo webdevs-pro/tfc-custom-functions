@@ -57,7 +57,6 @@ class TFC_Brevo_API {
 		$lists_api = new ListsApi( new Client(), $config );
 
 
-
 		try {
 			// Step 2: Fetch contacts from the specified segment and filter by city
 			$limit = 50; // Number of contacts to fetch per request
@@ -66,10 +65,7 @@ class TFC_Brevo_API {
 
 			do {
 				// Fetch contacts from the segment
-				$contacts = $contacts_api->getContacts($limit, $offset, null, null, 'desc', $list_id, null);
-				//   echo '<pre>' . print_r($contacts, true) . '</pre><br>';
-
-
+				$contacts = $contacts_api->getContacts( $limit, $offset, null, null, 'desc', $list_id, null );
 
 				foreach ( $contacts->getContacts() as $contact ) {
 						// Check if the contact has attributes and the specified city in the attributes
@@ -96,12 +92,12 @@ class TFC_Brevo_API {
 			error_log( "filtered_emails\n" . print_r( $filtered_emails, true ) . "\n" );
 
 			// Step 3: Create a temporary list to hold the filtered contacts
-			$list_name = 'Temp List for ' . sanitize_text_field( $campaign_name );
+			$temp_list_name = 'Temp List ' . date("Y-m-d H:i:s");
+
 			$temp_folder_id = 28;
-			$list = new CreateList(array('name' => $list_name, 'folderId' => $temp_folder_id));
-			$list_response = $lists_api->createList($list);
+			$list = new CreateList( array( 'name' => $temp_list_name, 'folderId' => $temp_folder_id) );
+			$list_response = $lists_api->createList( $list );
 			$list_id = $list_response->getId();
-			echo '<pre>' . print_r($list_id, true) . '</pre><br>';
 
 			// Step 4: Add contacts to the temporary list
 			$add_contacts = new AddContactToList(array('emails' => $filtered_emails));
@@ -109,8 +105,8 @@ class TFC_Brevo_API {
 
 			// Step 5: Create the email campaign
 			$campaign = new CreateEmailCampaign();
-			$campaign->setName( sanitize_text_field( $campaign_name ) );
-			$campaign->setSubject( sanitize_text_field( $subject ) );
+			$campaign->setName( $campaign_name );
+			$campaign->setSubject( $subject );
 			$campaign->setHtmlContent( $content );
 			$campaign->setSender( new CreateEmailCampaignSender( array(
 				'name'  => get_bloginfo( 'name' ),
