@@ -13,6 +13,7 @@ class TFC_Email {
 
 	public function register_rest_route() {
 		// https://tomsflightclub.com/wp-json/tfc/v1/email_free
+		// Triggered from Airtable
 		register_rest_route( 'tfc/v1', 'email_free', array(
 			'methods'             => 'POST',
 			'callback'            => array( $this, 'generate_free_email_template' ),
@@ -20,6 +21,7 @@ class TFC_Email {
 		) );
 
 		// https://tomsflightclub.com/wp-json/tfc/v1/email_paid
+		// Triggered from Airtable
 		register_rest_route( 'tfc/v1', 'email_paid', array(
 			'methods'             => 'POST',
 			'callback'            => array( $this, 'generate_paid_email_template' ),
@@ -29,18 +31,33 @@ class TFC_Email {
 
 	public function generate_free_email_template( $request ) {
 		error_log( "generate_free_email_template\n" );
-		$this->generate_email_template( $request, 'free' );
+
+		// $parameters = array(
+		// 	'Deals' => [], // Array of deals
+		// 	'Origin City' => [], // String origin city
+		// );
+
+		$parameters = $request->get_params();
+
+		$brevo = new TFC_Brevo_API;
+
+		$list_id = get_field( 'tfc_brevo_campaign_list_id', 'option' );
+		$origin_city = $parameters['Origin City'];
+		$subscription_type = 2; // Free
+		$campaign_name = 'Test campaign ' . date("Y-m-d H:i:s");
+		$subject = 'Test deals ' . date("Y-m-d H:i:s");
+		$content = $this->get_email_body( $request, 'free' );
+
+		$brevo->create_brevo_campaign( $list_id, $origin_city, $subscription_type, $campaign_name, $subject, $content );
 	}
 
 	public function generate_paid_email_template( $request ) {
 		error_log( "generate_paid_email_template\n" );
-		$this->generate_email_template( $request, 'paid' );
+		$body = $this->get_email_body( $request, 'paid' );
 	}
 
-	public function generate_email_template( $request, $type ) {
+	public function get_email_body( $request, $type ) {
 		$parameters = $request->get_params();
-
-		// error_log( "parameters\n" . print_r( $parameters[0]['Array'], true ) . "\n" );
 
 		ob_start();
 		
@@ -50,7 +67,7 @@ class TFC_Email {
 			include $file_path;
 		}
 
-		foreach ( $parameters[0]['Array'] as $index => $deal_data ) {
+		foreach ( $parameters['Deals'] as $index => $deal_data ) {
 			if ( $type == 'paid' ) {
 				$this->get_table_row( $index, $deal_data, 'link_to_deal' );
 			} else if ( $type == 'free' && $index === 0 ) {
@@ -66,27 +83,7 @@ class TFC_Email {
 			echo file_get_contents( $file_path );
 		}
 
-		$html = ob_get_clean();
-
-		// error_log( "html\n" . print_r( $html, true ) . "\n" );
-
-		$webhook_url = get_field( 'makecom_webhook_url_' . $type, 'option' );
-
-		wp_remote_post( 
-			$webhook_url,
-			array(
-				'body' => array(
-					'html' => $html,
-				),
-			)
-		);
-		
-		wp_send_json_success( 
-			array(
-				'success' => true,
-			)
-			, 200 
-		);
+		return ob_get_clean();
 	}
 
 

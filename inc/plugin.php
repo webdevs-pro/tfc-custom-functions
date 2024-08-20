@@ -79,8 +79,8 @@ function tfc_dynamic_page_title() {
  * @param string $meta_key    Meta key.
  * @param mixed  $meta_value  Meta value.
  */
-add_action( 'update_user_meta', 'tfc_listen_update_user_meta', 10, 4 );
-function tfc_listen_update_user_meta( $meta_id, $object_id, $meta_key, $meta_value ) {
+add_action( 'update_user_meta', 'tfc_on_update_user_meta', 10, 4 );
+function tfc_on_update_user_meta( $meta_id, $object_id, $meta_key, $meta_value ) {
 
 	// Debug
 	if ( is_array( $meta_value ) ) {
@@ -111,28 +111,9 @@ function tfc_listen_update_user_meta( $meta_id, $object_id, $meta_key, $meta_val
 		}
 	}
 
-	// if ( $meta_key == 'subscription' ) {
-	// 	$user = get_userdata( $object_id );
-	// 	$url = 'https://hook.eu2.make.com/ky7k4n1lpb7n9tvcqp4jfa1x1qdqclju';
-	// 	$payload = array(
-	// 		'email' => $user->user_email,
-	// 	);
-
-	// 	if ( $meta_value == 'active' ) {
-	// 		$payload['subscription'] = 'paid';
-	// 	} else {
-	// 		$payload['subscription'] = 'free';
-	// 	}
-
-
-	// 	tfc_send_webhook_payload( $url, $payload );
-	// }
-
 	if ( $meta_key == 'subscription' || $meta_key == 'origin_city' ) {
 		$user = get_userdata( $object_id );
-
 		$user_email = $user->user_email;
-
 		$data = array();
 
 		if ( $meta_key == 'subscription' ) {
@@ -148,7 +129,6 @@ function tfc_listen_update_user_meta( $meta_id, $object_id, $meta_key, $meta_val
 		}
 
 		$brevo = new TFC_Brevo_API;
-
 		$brevo->update_contact( $user_email, $data );
 	}
 	
