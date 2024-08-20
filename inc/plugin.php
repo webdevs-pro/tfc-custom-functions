@@ -80,18 +80,18 @@ function tfc_dynamic_page_title() {
  */
 add_action( 'update_user_meta', 'tfc_listen_update_user_meta', 10, 4 );
 function tfc_listen_update_user_meta( $meta_id, $object_id, $meta_key, $meta_value ) {
-	// Check if the meta value is an array.
-	if ( is_array( $meta_value ) ) {
-		ob_start(); // Start buffering to capture output
-			print_r( $meta_value );
-		$output = ob_get_clean(); // Get the output and clean buffer
 
-		// You can log this output to a file or handle it as needed
+	// Debug
+	if ( is_array( $meta_value ) ) {
+		ob_start();
+			print_r( $meta_value );
+		$output = ob_get_clean();
+
 		error_log( "Updated user meta for user {$object_id}: {$meta_key} = {$output}" );
 	} else {
-		// Handle non-array meta values normally.
 		error_log( "Updated user meta for user {$object_id}: {$meta_key} = {$meta_value}" );
 	}
+	
 
 	if ( $meta_key == 'stripe_username' ) {
 		$user = get_userdata( $object_id );

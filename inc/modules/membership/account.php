@@ -82,11 +82,14 @@ class TFC_User_Account {
 			$errors = [];
 	
 			$nickname = isset( $_POST['full_name'] ) ? sanitize_text_field( wp_unslash( $_POST['first_name'] ) ) : '';
+			$origin_city = isset( $_POST['origin_city'] ) ? sanitize_text_field( wp_unslash( $_POST['origin_city'] ) ) : '';
 	
 			wp_update_user( array(
 				'ID' => $current_user->ID,
 				'nickname' => $nickname,
 			) );
+
+			update_user_meta( $current_user->ID, 'origin_city', $origin_city );
 
 	
 			// Update user password
@@ -147,6 +150,12 @@ class TFC_User_Account {
 			delete_transient( 'user_account_errors_' . $current_user->ID );
 		}
 
+		$selected_origin_city = get_user_meta( $current_user->ID, 'origin_city', true );
+		$origin_city_terms    = get_terms( array(
+			'taxonomy' => 'origin-city',
+			'hide_empty' => false,
+		) );
+
 		ob_start();
 		?>
 
@@ -186,6 +195,25 @@ class TFC_User_Account {
 						<label for="first_name">Full Name</label>
 						<input type="text" id="full_name" name="full_name" value="<?php echo esc_attr( $current_user->nickname ); ?>" />
 					</p>
+
+					<p>
+						<label for="origin_city">Origin City</label>
+						<select id="origin_city" name="origin_city">
+							<option value="" hidden>Select your origin city</option>
+							<?php
+							if ( ! empty( $origin_city_terms ) && ! is_wp_error( $origin_city_terms ) ) {
+								foreach ( $origin_city_terms as $term ) {
+									printf(
+										'<option value="%s"%s>%s</option>',
+										esc_attr( $term->name ),
+										selected( strtolower( $selected_origin_city ), strtolower( $term->name ), false ),
+										esc_html( $term->name )
+									);
+								}
+							}
+							?>
+						</select>
+					</p>
 				</div>
 
 				<div class="password-filesds-toggle">Change password</div>
@@ -224,7 +252,8 @@ class TFC_User_Account {
 				grid-template-columns: 1fr;
 				gap: 12px 24px;
 			}
-			#tfc-account input {
+			#tfc-account input,
+			#tfc-account select {
 				border: 1px solid #ECEDF2;
 				background-color: #FAFBFF;
 				border-radius: 5px;
