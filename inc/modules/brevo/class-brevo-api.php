@@ -93,7 +93,7 @@ class TFC_Brevo_API {
 				return;
 			}
 
-			$filtered_emails = ['alex@website.cv.ua'];
+			error_log( "filtered_emails\n" . print_r( $filtered_emails, true ) . "\n" );
 
 			// Step 3: Create a temporary list to hold the filtered contacts
 			$list_name = 'Temp List for ' . sanitize_text_field( $campaign_name );
@@ -111,7 +111,7 @@ class TFC_Brevo_API {
 			$campaign = new CreateEmailCampaign();
 			$campaign->setName( sanitize_text_field( $campaign_name ) );
 			$campaign->setSubject( sanitize_text_field( $subject ) );
-			$campaign->setHtmlContent( wp_kses_post( $content ) );
+			$campaign->setHtmlContent( $content );
 			$campaign->setSender( new CreateEmailCampaignSender( array(
 				'name'  => get_bloginfo( 'name' ),
 				'email' => 'hello@tomsflightclub.com'
