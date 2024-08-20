@@ -20,9 +20,7 @@ class TFC_Brevo_API {
 	private $api_key;
 
 	public function __construct() {
-
 		$this->api_key = get_field( 'tfc_brevo_api_key', 'option' );
-
 	}
 		
 	public function update_contact( $contact_email, $data ) {
@@ -56,6 +54,7 @@ class TFC_Brevo_API {
 		$campaigns_api = new EmailCampaignsApi( new Client(), $config );
 		$lists_api = new ListsApi( new Client(), $config );
 
+		$this->maybe_add_new_origin_city_term( $origin_city );
 
 		try {
 			// Step 2: Fetch contacts from the specified segment and filter by city
@@ -122,9 +121,6 @@ class TFC_Brevo_API {
 			$response = $campaigns_api->createEmailCampaign( $campaign );
 			$campaign_id = $response->getId();
 
-			// Log the campaign creation response for debugging
-			echo '<pre>' . print_r($response, true) . '</pre><br>';
-
 			// Step 8: Send the campaign immediately
 			$response = $campaigns_api->sendEmailCampaignNow( $campaign_id );
 
@@ -137,10 +133,29 @@ class TFC_Brevo_API {
 			// Log the success message
 			error_log( __( 'Campaign created and sent successfully!', 'myplugin' ) );
 		} catch ( Exception $e ) {
-				// Log the exception message
-				error_log( sprintf( __( 'Exception when creating campaign: %s', 'myplugin' ), $e->getMessage() ) );
+			// Log the exception message
+			error_log( sprintf( __( 'Exception when creating campaign: %s', 'myplugin' ), $e->getMessage() ) );
 		}
 	}
+
+	private function maybe_add_new_origin_city_term( $origin_city ) {
+		// Check if the term exists in the 'origin-city' taxonomy
+		$term_exists = term_exists( $origin_city, 'origin-city' );
+
+		if ( $term_exists === null ) {
+			// The term does not exist, so let's add it
+			$new_term = wp_insert_term( $origin_city, 'origin-city' );
+
+			if ( is_wp_error( $new_term ) ) {
+				// Handle the error if the term could not be added
+				error_log( 'Failed to add origin city term: ' . $new_term->get_error_message() );
+			} else {
+				$term_id = $new_term['term_id'];
+				error_log( 'Added origin city term: ' . $new_term['name'] );
+			}
+		}
+	}
+	
 }
 
 

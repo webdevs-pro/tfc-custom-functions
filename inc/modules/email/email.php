@@ -44,7 +44,7 @@ class TFC_Email {
 		$list_id = intval( get_field( 'tfc_brevo_campaign_list_id', 'option' ) );
 		$origin_city = $parameters['Origin City'];
 		$subscription_type = 2; // Free
-		$campaign_name = 'Flights from ' . $origin_city . ' campaign (free) ' . date("Y-m-d H:i:s");
+		$campaign_name = $origin_city . ' ' . date('jS F') . ' (free) ' . date("Y-m-d H:i:s");
 		$subject = date('jS F') . ' Edition';
 		$content = $this->get_email_body( $request, 'free' );
 		
@@ -60,7 +60,7 @@ class TFC_Email {
 		$list_id = intval( get_field( 'tfc_brevo_campaign_list_id', 'option' ) );
 		$origin_city = $parameters['Origin City'];
 		$subscription_type = 1; // Paid
-		$campaign_name = 'Flights from ' . $origin_city . ' campaign (paid) ' . date("Y-m-d H:i:s");
+		$campaign_name = $origin_city . ' ' . date('jS F') . ' (paid) ' . date("Y-m-d H:i:s");
 		$subject = date('jS F') . ' Edition';
 		$content = $this->get_email_body( $request, 'paid' );
 		
