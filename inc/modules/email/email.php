@@ -41,11 +41,11 @@ class TFC_Email {
 
 		$parameters = $request->get_params();
 
-		$list_id = get_field( 'tfc_brevo_campaign_list_id', 'option' );
+		$list_id = intval( get_field( 'tfc_brevo_campaign_list_id', 'option' ) );
 		$origin_city = $parameters['Origin City'];
 		$subscription_type = 2; // Free
-		$campaign_name = 'Test campaign ' . date("Y-m-d H:i:s");
-		$subject = 'Test deals ' . date("Y-m-d H:i:s");
+		$campaign_name = 'Flights from ' . $origin_city . ' campaign (free) ' . date("Y-m-d H:i:s");
+		$subject = date('jS F') . ' Edition';
 		$content = $this->get_email_body( $request, 'free' );
 		
 		$brevo = new TFC_Brevo_API;
@@ -54,7 +54,18 @@ class TFC_Email {
 
 	public function generate_paid_email_template( $request ) {
 		error_log( "generate_paid_email_template\n" );
-		$body = $this->get_email_body( $request, 'paid' );
+
+		$parameters = $request->get_params();
+
+		$list_id = intval( get_field( 'tfc_brevo_campaign_list_id', 'option' ) );
+		$origin_city = $parameters['Origin City'];
+		$subscription_type = 1; // Paid
+		$campaign_name = 'Flights from ' . $origin_city . ' campaign (paid) ' . date("Y-m-d H:i:s");
+		$subject = date('jS F') . ' Edition';
+		$content = $this->get_email_body( $request, 'paid' );
+		
+		$brevo = new TFC_Brevo_API;
+		$brevo->create_brevo_campaign( $list_id, $origin_city, $subscription_type, $campaign_name, $subject, $content );
 	}
 
 	public function get_email_body( $request, $type ) {
