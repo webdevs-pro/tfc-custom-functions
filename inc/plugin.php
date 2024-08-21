@@ -189,27 +189,3 @@ function tfc_review_social_icon() {
 
 	return ob_get_clean();
 }
-
-
-
-// add_filter( 'elementor_pro/forms/render/item/select', 'tfc_signup_form_cities', 10, 3 );
-// function tfc_signup_form_cities( $field, $field_index, $form ) {
-// 	if ( $field['custom_id'] == 'origin_city' ) {
-
-// 		$args = array(
-// 			'taxonomy'   => 'origin-city',
-// 			'hide_empty' => false,
-// 		);
-
-// 		$city_terms = get_terms( $args );
-// 		$city_names = array();
-
-// 		foreach ( $city_terms as $city_term ) {
-// 			$city_names[] = $city_term->name;
-// 		}
-
-// 		$field['field_options'] = implode( "\n", $city_names );
-// 	}
-
-// 	return $field;
-// }
