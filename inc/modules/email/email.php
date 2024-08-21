@@ -42,7 +42,7 @@ class TFC_Email {
 		$parameters = $request->get_params();
 
 		$list_id = intval( get_field( 'tfc_brevo_campaign_list_id', 'option' ) );
-		$origin_city = $parameters['Origin City'];
+		$origin_city = sanitize_text_field( $parameters['Origin City'] );
 		$subscription_type = 2; // Free
 		$campaign_name = $origin_city . ' ' . date('jS F') . ' (free) ' . date("Y-m-d H:i:s");
 		$subject = date('jS F') . ' Edition';
@@ -58,7 +58,7 @@ class TFC_Email {
 		$parameters = $request->get_params();
 
 		$list_id = intval( get_field( 'tfc_brevo_campaign_list_id', 'option' ) );
-		$origin_city = $parameters['Origin City'];
+		$origin_city = sanitize_text_field( $parameters['Origin City'] );
 		$subscription_type = 1; // Paid
 		$campaign_name = $origin_city . ' ' . date('jS F') . ' (paid) ' . date("Y-m-d H:i:s");
 		$subject = date('jS F') . ' Edition';
@@ -118,7 +118,7 @@ class TFC_Email {
 											<tr>
 												<td style="padding:0px;">
 													<a  href="https://tomsflightclub.com/" target="_blank">
-														<img class="imgsize" src="<?php echo $deal_data['Deal City Image']; ?>" width="220" alt="" style="border:0;width:100%;max-width:220px;height:auto;display:block; border-radius: 10px;">
+														<img class="imgsize" src="<?php echo esc_url( $deal_data['Deal City Image'] ); ?>" width="220" alt="" style="border:0;width:100%;max-width:220px;height:auto;display:block; border-radius: 10px;">
 													</a>
 												</td>
 											</tr>
@@ -140,11 +140,11 @@ class TFC_Email {
 												<td style="width: 100%; padding: 10px 10px 6px 0; background-color: transparent;">
 													<h1  style="font-size: 14px; color:#80889E; font-family: 'Inter', Arial, sans-serif; background-color: transparent;">
 														<span class="darkmode-bg" style="color:#000000; font-size: 18px; font-weight: bold;">
-															<?php echo $deal_data['Origin City']; ?>
+															<?php echo sanitize_text_field( $deal_data['Origin City'] ); ?>
 														</span>
 														&nbsp;to&nbsp;
 														<span class="darkmode-bg" style="color:#000000; font-size: 18px; font-weight: bold;">
-															<?php echo $deal_data['Destination City']; ?>
+															<?php echo sanitize_text_field( $deal_data['Destination City'] ); ?>
 														</span>
 													</h1>
 
@@ -161,7 +161,7 @@ class TFC_Email {
 													<table align="left" border="0" cellpadding="0" cellspacing="0" role="presentation" style="width: 100%; border-spacing:0; background-color:transparent;">
 														<tr>
 															<td style="padding: 0; font-size: 14px;" >
-																<img width="20" style="vertical-align: middle; margin-right: 6px;" src="https://i.postimg.cc/nrFmsKQy/Calendar.png" alt="" /><span style="vertical-align: middle;" ><?php echo $deal_data['Trip Duration']; ?> Day Return Trip</span>
+																<img width="20" style="vertical-align: middle; margin-right: 6px;" src="https://i.postimg.cc/nrFmsKQy/Calendar.png" alt="" /><span style="vertical-align: middle;" ><?php echo sanitize_text_field( $deal_data['Trip Duration'] ); ?> Day Return Trip</span>
 															</td>
 
 															<td class="leftpad" style="border-radius:4px; font-size: 14px; padding: 0 0 0 6px; background-color: transparent;">                                           
@@ -179,11 +179,11 @@ class TFC_Email {
 													<table border="0" cellpadding="0" cellspacing="0" role="presentation" style="border-spacing:0;">
 														<tr>
 															<td style="font-size: 16px; color: #415BE7; font-family: 'Inter', Arial, sans-serif; padding: 0 10px 0 0; font-weight: bold; border: 0;">
-																<?php echo $deal_data['Currency and Price']; ?>
+																<?php echo sanitize_text_field( $deal_data['Currency and Price'] ); ?>
 															</td>
 															<td align="center" style="border-radius:10px; font-size: 20px;background-color: #415BE7;" bgcolor="#415BE7" >
 																<?php if ( $button_type == 'link_to_deal' ) { ?>
-																	<a href="<?php echo $deal_data['Skyscanner Deal Link']; ?>" target="_blank" style="font-size: 14px;font-weight: normal;text-decoration: none;color: #ffffff;background-color: #415BE7;border:1px solid #263EC4;border-radius:10px;padding:10px 18px;display: inline-block; font-family: 'Inter', Arial, sans-serif;">
+																	<a href="<?php echo esc_url( $deal_data['Skyscanner Deal Link'] ); ?>" target="_blank" style="font-size: 14px;font-weight: normal;text-decoration: none;color: #ffffff;background-color: #415BE7;border:1px solid #263EC4;border-radius:10px;padding:10px 18px;display: inline-block; font-family: 'Inter', Arial, sans-serif;">
 																		Get Deal
 																	</a>
 																<?php } else if ( $button_type == 'subscribe_button' ) { ?>
