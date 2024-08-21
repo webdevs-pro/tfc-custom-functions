@@ -43,24 +43,12 @@ class Elementor_Form_Cities_Select extends \ElementorPro\Modules\Forms\Fields\Fi
 			$form->add_render_attribute( 'select' . $item_index, 'aria-required', 'true' );
 		}
 
-		echo '<div class="elementor-field elementor-select-wrapper remove-before">';
+		echo '<div class="elementor-field elementor-select-wrapper">';
 
 		?>
 		<div <?php $form->print_render_attribute_string( 'select-wrapper' . $item_index ); ?>>
-			<div class="select-caret-down-wrapper">
-				<?php
-				if ( ! $item['allow_multiple'] ) {
-					$icon = [
-						'library' => 'eicons',
-						'value' => 'eicon-caret-down',
-						'position' => 'right',
-					];
-					Icons_Manager::render_icon( $icon, [ 'aria-hidden' => 'true' ] );
-				}
-				?>
-			</div>
 
-			<select <?php $form->print_render_attribute_string( 'select' . $item_index ); ?>>
+			<select <?php $form->print_render_attribute_string( 'select' . $item_index ); ?> style="appearance: auto;">
 				<?php
 
 				$args = array(
