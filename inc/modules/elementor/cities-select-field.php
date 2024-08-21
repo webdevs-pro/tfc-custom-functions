@@ -73,7 +73,7 @@ class Elementor_Form_Cities_Select extends \ElementorPro\Modules\Forms\Fields\Fi
 				echo '<option value="" hidden selected>' . $item['cities-select-placeholder'] . '</option>';
 
 				foreach ( $city_terms as $city_term ) {
-					echo '<option value="' . $city_term->slug . '">' . $city_term->name . '</option>';
+					echo '<option value="' . $city_term->name . '">' . $city_term->name . '</option>';
 				}
 
 			echo '</select>';

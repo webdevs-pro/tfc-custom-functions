@@ -157,12 +157,3 @@ class TFC_Brevo_API {
 	}
 	
 }
-
-
-// // Example data
-// $data = array(
-// 	'attributes' => [
-// 		'CITY' => 'London',
-// 		'SUBSCRIPTION' => 1
-// 	]
-// );
