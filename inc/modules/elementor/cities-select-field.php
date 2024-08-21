@@ -70,10 +70,23 @@ class Elementor_Form_Cities_Select extends \ElementorPro\Modules\Forms\Fields\Fi
 
 				$city_terms = get_terms( $args );
 
-				echo '<option value="" hidden selected>' . $item['cities-select-placeholder'] . '</option>';
-
+				$selected_city = isset( $_GET['signup-city'] ) ? $_GET['signup-city'] : '';
+				$city_found = false;
+				
 				foreach ( $city_terms as $city_term ) {
-					echo '<option value="' . $city_term->name . '">' . $city_term->name . '</option>';
+					 if ( $selected_city === $city_term->name ) {
+						  $city_found = true;
+						  break;
+					 }
+				}
+				
+				if ( ! $city_found ) {
+					 echo '<option value="" hidden selected>' . esc_html( $item['cities-select-placeholder'] ) . '</option>';
+				}
+				
+				foreach ( $city_terms as $city_term ) {
+					 $selected = selected( $selected_city, $city_term->name, false );
+					 echo '<option value="' . esc_attr( $city_term->name ) . '"' . $selected . '>' . esc_html( $city_term->name ) . '</option>';
 				}
 
 			echo '</select>';

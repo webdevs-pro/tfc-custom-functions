@@ -72,6 +72,24 @@ function tfc_dynamic_page_title() {
 
 
 /**
+ * Shortcode to return the page/post title, with a personalized greeting on the Account page.
+ *
+ * @return string The page/post title or personalized greeting.
+ */
+add_shortcode( 'tfc-from-city', 'tfc_from_city_text' );
+function tfc_from_city_text() {
+	// Get the current post/page title.
+	$text = '';
+
+	if ( isset( $_GET['signup-city'] ) && $_GET['signup-city'] ) {
+		$text = 'from ' . $_GET['signup-city'];
+	}
+
+	return $text;
+}
+
+
+/**
  * Function to perform actions after user meta is updated, with debugging for array values.
  *
  * @param int    $meta_id     ID of the metadata entry.
@@ -135,44 +153,6 @@ function tfc_on_update_user_meta( $meta_id, $object_id, $meta_key, $meta_value )
 
 }
 
-
-
-/**
- * Sends a webhook payload.
- *
- * @param string $url The webhook URL.
- * @param array  $payload The data to send.
- * @return void
- */
-function tfc_send_webhook_payload( $url, $payload ) {
-	// Ensure the URL is valid.
-	if ( ! filter_var( $url, FILTER_VALIDATE_URL ) ) {
-		return;
-	}
-
-	// Prepare the arguments for the request.
-	$args = array(
-		'body'        => wp_json_encode( $payload ),
-		'headers'     => array(
-			'Content-Type' => 'application/json',
-		),
-		'data_format' => 'body',
-		'timeout'     => 15,
-	);
-
-	// Send the POST request.
-	$response = wp_remote_post( $url, $args );
-
-	// Handle the response.
-	if ( is_wp_error( $response ) ) {
-		error_log( 'Webhook POST request failed: ' . $response->get_error_message() );
-	} else {
-		$status_code = wp_remote_retrieve_response_code( $response );
-		if ( 200 !== $status_code ) {
-				error_log( 'Webhook POST request returned status code: ' . $status_code );
-		}
-	}
-}
 
 
 
