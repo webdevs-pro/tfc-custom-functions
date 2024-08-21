@@ -189,3 +189,5 @@ function tfc_review_social_icon() {
 
 	return ob_get_clean();
 }
+
+

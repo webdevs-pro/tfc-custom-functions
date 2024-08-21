@@ -65,6 +65,10 @@
             text-decoration: inherit !important;
          }
 
+         .darkmode-transparent {
+            background-color: #fff;
+         }
+
          @media (prefers-color-scheme: dark) {
             body, center, table .darkmode-bg {
                color: #ffffff !important;
