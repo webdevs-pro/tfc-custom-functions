@@ -174,10 +174,20 @@ class TFC_User_Account {
 			<?php } ?>
 
 			<script>
-				jQuery(document).ready(function($) {
-					$('.password-filesds-toggle').on('click', function() {
-						$('.password-fields').slideToggle();
-					})
+				function deferJQuery(fn) {
+					if (window.jQuery) {
+							jQuery(document).ready(fn);
+					} else {
+							setTimeout(function() {
+								deferJQuery(fn);
+							}, 50);
+					}
+				}
+
+				deferJQuery(function() {
+					jQuery('.password-filesds-toggle').on('click', function() {
+							jQuery('.password-fields').slideToggle();
+					});
 				});
 			</script>
 

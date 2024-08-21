@@ -72,9 +72,7 @@ function tfc_dynamic_page_title() {
 
 
 /**
- * Shortcode to return the page/post title, with a personalized greeting on the Account page.
- *
- * @return string The page/post title or personalized greeting.
+ * Shortcode to return from city text from the URL.
  */
 add_shortcode( 'tfc-from-city', 'tfc_from_city_text' );
 function tfc_from_city_text() {
@@ -191,3 +189,37 @@ function tfc_review_social_icon() {
 }
 
 
+
+
+/**
+ * Tracking scripts.
+ */
+add_action( 'wp_head', function() {
+	if ( current_user_can( 'subscriber' ) ) { // Check if the user has the 'subscriber' role
+		$current_user = wp_get_current_user();
+		$subscription_status = get_user_meta( $current_user->ID, 'subscription', true );
+
+		if ( $subscription_status == 'active' ) {
+			$subscription_type = 'paid';
+		} else {
+			$subscription_type = 'free';
+		}
+
+		
+		if ( is_page( 'paid-subscribe-successful' ) ) {
+			?>
+
+			<?php
+		} else {
+			?>
+			<script>
+				window.dataLayer = window.dataLayer || [];
+				window.dataLayer.push({
+					user_id: '<?php echo esc_js( $current_user->ID ); ?>',
+					subscription_type: '<?php echo esc_js( $subscription_type ); ?>'
+				});
+			</script>
+			<?php
+		}
+	}
+}, 1 );
