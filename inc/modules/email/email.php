@@ -188,7 +188,7 @@ class TFC_Email {
 																	</a>
 																<?php } else if ( $button_type == 'subscribe_button' ) { ?>
 																	<a href="https://tomsflightclub.com/subscribe/" target="_blank" style="font-size: 14px;font-weight: normal;text-decoration: none;color: #ffffff;background-color: #415BE7;border:1px solid #263EC4;border-radius:10px;padding:10px 18px;display: inline-block; font-family: 'Inter', Arial, sans-serif;">
-																		Become a Premiunm Member
+																		Become a Premium Member
 																	</a>
 																<?php } ?>
 															</td> 

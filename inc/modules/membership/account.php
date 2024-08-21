@@ -81,7 +81,7 @@ class TFC_User_Account {
 			$current_user = wp_get_current_user();
 			$errors = [];
 	
-			$nickname = isset( $_POST['full_name'] ) ? sanitize_text_field( wp_unslash( $_POST['first_name'] ) ) : '';
+			$nickname = isset( $_POST['full_name'] ) ? sanitize_text_field( wp_unslash( $_POST['full_name'] ) ) : '';
 			$origin_city = isset( $_POST['origin_city'] ) ? sanitize_text_field( wp_unslash( $_POST['origin_city'] ) ) : '';
 	
 			wp_update_user( array(
