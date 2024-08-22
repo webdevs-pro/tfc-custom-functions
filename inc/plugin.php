@@ -195,7 +195,7 @@ function tfc_review_social_icon() {
  * Tracking scripts.
  */
 add_action( 'wp_head', function() {
-	if ( current_user_can( 'subscriber' ) ) { // Check if the user has the 'subscriber' role
+	if ( current_user_can( 'subscriber' ) || isset( $_GET['signup'] ) ) { // Check if the user has the 'subscriber' role
 		$current_user = wp_get_current_user();
 		$subscription_status = get_user_meta( $current_user->ID, 'subscription', true );
 
@@ -211,10 +211,21 @@ add_action( 'wp_head', function() {
 			$subscription_type = 'free';
 		}
 
-		
+
 		if ( is_page( 'paid-subscribe-successful' ) ) {
 			?>
 
+			<?php
+		} else if ( is_page( 'paid-subscribe-successful' ) ) {
+			$email = $_GET( 'email') ?? '';
+			?>
+			<script>
+				window.dataLayer.push({
+					event: 'free_subscription',
+					user_email: '<?php echo esc_js( $email ); ?>',
+					user_id: '<?php echo esc_js( $user_id ); ?>'
+				})
+			</script>
 			<?php
 		} else {
 			?>
@@ -302,7 +313,13 @@ function tfc_handle_user_registration() {
 				$redirect_page_slug = isset( $_POST['redirect_page_slug'] ) ? sanitize_text_field( $_POST['redirect_page_slug'] ) : 'thank-you';
 
 				// Redirect to the custom thank-you page with the encoded user ID.
-				$redirect_url = add_query_arg( 'signup', $user_id, site_url( '/' . $redirect_page_slug ) );
+				$redirect_url = add_query_arg(
+					array(
+						'signup' => $user_id,
+						'email' => $email,
+					),
+					site_url( '/' . $redirect_page_slug )
+				);
 				wp_redirect( $redirect_url );
 				exit;
 			} else {
