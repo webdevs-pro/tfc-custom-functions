@@ -223,3 +223,239 @@ add_action( 'wp_head', function() {
 		}
 	}
 }, 1 );
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/**
+ * Handle user registration form submission.
+ *
+ * This function processes the form submission, creates a new user with the role
+ * of 'subscriber', sends the default WordPress welcome email, saves the selected
+ * city to user meta, and redirects the user to a specified thank-you page with
+ * the user ID encoded in Base64. If the email already exists or the selected city
+ * is invalid, the user is redirected back to the form with appropriate error
+ * messages.
+ */
+add_action( 'admin_post_nopriv_tfc_register_user', 'tfc_handle_user_registration' );
+add_action( 'admin_post_tfc_register_user', 'tfc_handle_user_registration' );
+function tfc_handle_user_registration() {
+	// Check the nonce and make sure the email is set.
+	if ( isset( $_POST['email'] ) && wp_verify_nonce( $_POST['tfc_nonce'], 'tfc_register_user' ) ) {
+		$email = sanitize_email( $_POST['email'] );
+		$origin_city = isset( $_POST['origin_city'] ) ? sanitize_text_field( $_POST['origin_city'] ) : '';
+
+		// Ensure the email is valid and not already registered.
+		if ( is_email( $email ) && ! email_exists( $email ) ) {
+			// Check if the selected city exists in the 'origin-city' taxonomy.
+			$city_exists = term_exists( $origin_city, 'origin-city' );
+
+			if ( $city_exists ) {
+				$random_password = wp_generate_password();
+				$user_id = wp_create_user( $email, $random_password, $email );
+
+				// Set the user role to 'subscriber'.
+				wp_update_user(
+					array(
+						'ID'   => $user_id,
+						'role' => 'subscriber',
+					)
+				);
+
+				// Save the selected city to user meta.
+				update_user_meta( $user_id, 'origin_city', $origin_city );
+
+				// Send the default welcome email.
+				wp_new_user_notification( $user_id, null, 'user' );
+
+				// Encode the user ID using Base64.
+				$encoded_user_id = base64_encode( $user_id );
+
+				// Get the redirect page slug from the form data.
+				$redirect_page_slug = isset( $_POST['redirect_page_slug'] ) ? sanitize_text_field( $_POST['redirect_page_slug'] ) : 'thank-you';
+
+				// Redirect to the custom thank-you page with the encoded user ID.
+				$redirect_url = add_query_arg( 'signup', $encoded_user_id, site_url( '/' . $redirect_page_slug ) );
+				wp_redirect( $redirect_url );
+				exit;
+			} else {
+				// Redirect back to the form page with a 'city-not-exists' parameter.
+				$redirect_url = add_query_arg( 'city-not-exists', 'true', wp_get_referer() );
+				wp_redirect( $redirect_url );
+				exit;
+			}
+		} else {
+			// Redirect back to the form page with an 'email-exists' parameter.
+			$redirect_url = add_query_arg( 'email-exists', 'true', wp_get_referer() );
+			wp_redirect( $redirect_url );
+			exit;
+		}
+	} else {
+		// If nonce validation fails or email is missing, reload the form with an error.
+		$redirect_url = add_query_arg( 'registration', 'failed', wp_get_referer() );
+		wp_redirect( $redirect_url );
+		exit;
+	}
+}
+
+
+
+
+
+
+
+
+
+/**
+ * Shortcode to display the user registration form.
+ *
+ * This shortcode outputs a form with an email field and handles
+ * the redirection to a specified page after successful registration.
+ * If the email already exists or the selected city is invalid,
+ * it displays appropriate error messages.
+ *
+ * @param array $atts Shortcode attributes.
+ * @return string HTML form output.
+ */
+function tfc_register_user_form_shortcode( $atts ) {
+	// Extract shortcode attributes with a default redirect page slug of 'thank-you'.
+	$atts = shortcode_atts(
+		array(
+				'redirect-page-slug' => 'thank-you',
+		),
+		$atts,
+		'tfc_register_form'
+	);
+
+	// Store the redirect page slug in a hidden input field.
+	$redirect_page_slug = esc_attr( $atts['redirect-page-slug'] );
+
+	ob_start();
+	?>
+
+	<form class="tfc-signup-form" method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
+		<input type="email" name="email" required placeholder="Enter Your Email" />
+
+		<select name="origin_city" required>
+			<?php
+			$args = array(
+				'taxonomy'   => 'origin-city',
+				'hide_empty' => false,
+			);
+
+			$city_terms = get_terms( $args );
+
+			$selected_city = isset( $_GET['signup-city'] ) ? $_GET['signup-city'] : '';
+			$city_found = false;
+			
+			foreach ( $city_terms as $city_term ) {
+				if ( $selected_city === $city_term->name ) {
+					$city_found = true;
+					break;
+				}
+			}
+			
+			if ( ! $city_found ) {
+				echo '<option value="" hidden selected>Select City</option>';
+			}
+			
+			foreach ( $city_terms as $city_term ) {
+				$selected = selected( $selected_city, $city_term->name, false );
+				echo '<option value="' . esc_attr( $city_term->name ) . '"' . $selected . '>' . esc_html( $city_term->name ) . '</option>';
+			}
+			?>
+		</select>
+
+		<?php wp_nonce_field( 'tfc_register_user', 'tfc_nonce' ); ?>
+		<input type="hidden" name="action" value="tfc_register_user">
+		<input type="hidden" name="redirect_page_slug" value="<?php echo esc_attr( $redirect_page_slug ); ?>">
+		<input type="submit" value="Sign Up" />
+	</form>
+	
+	<div class="error-messages">
+		<?php
+		// Check if the 'email-exists' parameter is set and display an error message.
+		if ( isset( $_GET['email-exists'] ) && 'true' === $_GET['email-exists'] ) {
+				echo '<p class="error-message">This email is already registered. Please use a different email.</p>';
+		}
+
+		// Check if the 'city-not-exists' parameter is set and display an error message.
+		if ( isset( $_GET['city-not-exists'] ) && 'true' === $_GET['city-not-exists'] ) {
+				echo '<p class="error-message">The selected city does not exist. Please select a valid city.</p>';
+		}
+
+		// Check if there was a general failure in the registration process.
+		if ( isset( $_GET['registration'] ) && 'failed' === $_GET['registration'] ) {
+			echo '<p class="error-message">Registration failed. Please try again.</p>';
+		}
+		?>
+	</div>
+
+
+	<script>
+		// JavaScript to remove error URL parameters after page load
+		window.addEventListener('load', function() {
+			var url = new URL(window.location.href);
+			url.searchParams.delete('email-exists');
+			url.searchParams.delete('city-not-exists');
+			url.searchParams.delete('registration');
+			window.history.replaceState({}, document.title, url.pathname + url.search);
+		});
+	</script>
+
+	<style>
+		.tfc-signup-form {
+			background-color: #fff;
+			padding: 4px;
+			border-radius: 5px;
+			width: 100%;
+		}
+		.tfc-signup-form input:not([type="submit"]),
+		.tfc-signup-form select {
+			border: none;
+			background-color: transparent;
+			font-size: 16px;
+			min-height: 47px;
+			padding: 6px 16px;
+		}
+		.tfc-signup-form input[type="submit"] {
+			background-color: #000000;
+			color: #ffffff;
+			font-family: "Open Sans", Sans-serif;
+			font-size: 16px;
+			font-weight: 700;
+			border-radius: 6px;
+			padding: 16px 0;
+			width: 100%;
+			line-height: 1;
+		}
+		.error-messages {
+			margin-top: 10px;
+			padding: 4px;
+		}
+		.error-message {
+			color: red;
+			font-size: 14px;
+		}
+	</style>
+
+	<?php
+	return ob_get_clean();
+}
+add_shortcode( 'tfc_register_form', 'tfc_register_user_form_shortcode' );
+
