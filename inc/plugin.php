@@ -216,7 +216,7 @@ add_action( 'wp_head', function() {
 			?>
 
 			<?php
-		} else if ( is_page( 'paid-subscribe-successful' ) ) {
+		} else if ( is_page( 'newsletter-signup-thank-you' ) ) {
 			$email = $_GET( 'email') ?? '';
 			?>
 			<script>
