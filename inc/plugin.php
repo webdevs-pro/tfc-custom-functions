@@ -199,6 +199,12 @@ add_action( 'wp_head', function() {
 		$current_user = wp_get_current_user();
 		$subscription_status = get_user_meta( $current_user->ID, 'subscription', true );
 
+		if ( isset( $_GET['signup'] ) && $_GET['signup'] ) {
+			$user_id = $_GET['signup'];
+		} else {
+			$user_id = $current_user->ID;
+		}
+
 		if ( $subscription_status == 'active' ) {
 			$subscription_type = 'paid';
 		} else {
@@ -215,7 +221,7 @@ add_action( 'wp_head', function() {
 			<script>
 				window.dataLayer = window.dataLayer || [];
 				window.dataLayer.push({
-					user_id: '<?php echo esc_js( $current_user->ID ); ?>',
+					user_id: '<?php echo esc_js( $user_id ); ?>',
 					subscription_type: '<?php echo esc_js( $subscription_type ); ?>'
 				});
 			</script>
