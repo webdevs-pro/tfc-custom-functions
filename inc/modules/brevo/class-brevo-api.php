@@ -22,7 +22,41 @@ class TFC_Brevo_API {
 	public function __construct() {
 		$this->api_key = get_field( 'tfc_brevo_api_key', 'option' );
 	}
-		
+
+	public function create_contact( $contact_email, $data ) {
+		$config = Brevo\Client\Configuration::getDefaultConfiguration()->setApiKey( 'api-key', $this->api_key );
+		$config = Brevo\Client\Configuration::getDefaultConfiguration()->setApiKey( 'partner-key', $this->api_key );
+
+		$apiInstance = new Brevo\Client\Api\ContactsApi(
+			new GuzzleHttp\Client(),
+			$config
+		);
+
+		$createContact = new \Brevo\Client\Model\CreateContact(); // \Brevo\Client\Model\CreateContact | Values to create a contact
+
+		$createContact->setEmail( $contact_email );
+
+		if ( isset( $data['attributes'] ) ) {
+			$createContact->setAttributes( $data['attributes'] );
+		}
+
+		if ( isset( $data['listIds'] ) ) {
+			$createContact->setListIds( $data['listIds'] );
+		}
+
+		if ( isset( $data['updateEnabled'] ) ) {
+			$createContact->setUpdateEnabled( $data['updateEnabled'] );
+		}
+
+		try {
+			$apiInstance->createContact( $createContact );
+
+		} catch ( Exception $e ) {
+			echo 'Exception when calling ContactsApi->createContact: ', $e->getMessage(), PHP_EOL;
+		}
+	}
+
+
 	public function update_contact( $contact_email, $data ) {
 		$config = Brevo\Client\Configuration::getDefaultConfiguration()->setApiKey( 'api-key', $this->api_key );
 		$config = Brevo\Client\Configuration::getDefaultConfiguration()->setApiKey( 'partner-key', $this->api_key );

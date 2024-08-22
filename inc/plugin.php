@@ -280,17 +280,23 @@ function tfc_handle_user_registration() {
 				// Save the selected city to user meta.
 				update_user_meta( $user_id, 'origin_city', $origin_city );
 
+				// Add new contact to Brevo
+				$data = array();
+				$data['attributes']['SUBSCRIPTION'] = 2; // Free
+				$data['attributes']['CITY'] = sanitize_text_field( $origin_city );
+
+				$brevo = new TFC_Brevo_API;
+				$brevo->create_contact( $email, $data );
+
+
 				// Send the default welcome email.
 				wp_new_user_notification( $user_id, null, 'user' );
-
-				// Encode the user ID using Base64.
-				$encoded_user_id = base64_encode( $user_id );
 
 				// Get the redirect page slug from the form data.
 				$redirect_page_slug = isset( $_POST['redirect_page_slug'] ) ? sanitize_text_field( $_POST['redirect_page_slug'] ) : 'thank-you';
 
 				// Redirect to the custom thank-you page with the encoded user ID.
-				$redirect_url = add_query_arg( 'signup', $encoded_user_id, site_url( '/' . $redirect_page_slug ) );
+				$redirect_url = add_query_arg( 'signup', $user_id, site_url( '/' . $redirect_page_slug ) );
 				wp_redirect( $redirect_url );
 				exit;
 			} else {
