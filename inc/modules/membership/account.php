@@ -186,7 +186,7 @@ class TFC_User_Account {
 
 				deferJQuery(function() {
 					jQuery('.password-filesds-toggle').on('click', function() {
-							jQuery('.password-fields').slideToggle();
+						jQuery('.password-fields').slideToggle();
 					});
 				});
 			</script>
