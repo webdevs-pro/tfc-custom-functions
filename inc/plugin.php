@@ -217,7 +217,7 @@ add_action( 'wp_head', function() {
 
 			<?php
 		} else if ( is_page( 'newsletter-signup-thank-you' ) ) {
-			$email = $_GET( 'email') ?? '';
+			$email = $_GET['email'] ?? '';
 			?>
 			<script>
 				window.dataLayer.push({
