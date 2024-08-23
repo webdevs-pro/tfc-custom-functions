@@ -195,15 +195,9 @@ function tfc_review_social_icon() {
  * Tracking scripts.
  */
 add_action( 'wp_head', function() {
-	if ( current_user_can( 'subscriber' ) || isset( $_GET['signup'] ) ) { // Check if the user has the 'subscriber' role
+	if ( current_user_can( 'subscriber' ) ) { // Check if the user has the 'subscriber' role
 		$current_user = wp_get_current_user();
 		$subscription_status = get_user_meta( $current_user->ID, 'subscription', true );
-
-		if ( isset( $_GET['signup'] ) && $_GET['signup'] ) {
-			$user_id = $_GET['signup'];
-		} else {
-			$user_id = $current_user->ID;
-		}
 
 		if ( $subscription_status == 'active' ) {
 			$subscription_type = 'paid';
@@ -211,37 +205,31 @@ add_action( 'wp_head', function() {
 			$subscription_type = 'free';
 		}
 
-
-		if ( is_page( 'paid-subscribe-successful' ) ) {
-			?>
-
-			<?php
-		} else if ( is_page( 'newsletter-signup-thank-you' ) ) {
-			$email = $_GET['email'] ?? '';
-			?>
-			<script>
-				window.dataLayer.push({
-					event: 'free_subscription',
-					user_email: '<?php echo esc_js( $email ); ?>',
-					user_id: '<?php echo esc_js( $user_id ); ?>'
-				})
-			</script>
-			<?php
-		} else {
-			?>
-			<script>
-				window.dataLayer = window.dataLayer || [];
-				window.dataLayer.push({
-					user_id: '<?php echo esc_js( $user_id ); ?>',
-					subscription_type: '<?php echo esc_js( $subscription_type ); ?>'
-				});
-			</script>
-			<?php
-		}
+		?>
+		<script>
+			window.dataLayer = window.dataLayer || [];
+			window.dataLayer.push({
+				user_id: '<?php echo esc_js( $current_user->ID ); ?>',
+				subscription_type: '<?php echo esc_js( $subscription_type ); ?>'
+			});
+		</script>
+		<?php
 	}
 }, 1 );
 
-
+add_action( 'wp_body_open', function() {
+	if ( is_page( 'newsletter-signup-thank-you' ) && isset( $_GET['signup'] ) && isset( $_GET['email'] ) ) {
+		?>
+		<script>
+			window.dataLayer.push({
+				event: 'free_subscription',
+				user_email: '<?php echo esc_js( $_GET['email'] ); ?>',
+				user_id: '<?php echo esc_js( $_GET['signup'] ); ?>'
+			})
+		</script>
+		<?php 
+	}
+}, 99 );
 
 
 
