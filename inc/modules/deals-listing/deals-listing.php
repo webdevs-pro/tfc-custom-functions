@@ -291,11 +291,11 @@ class TFC_Deals_Listing {
 
 
 	public function loop_grid_deals_query_filter( $query, $widget ) {
+		$user_id = get_current_user_id();
+		$user_origin_city = get_user_meta( $user_id, 'origin_city', true );
 
-		if ( is_user_logged_in() ) {
+		if ( is_user_logged_in() && $user_origin_city ) {
 			// Get the current user's 'origin_city' meta field
-			$user_id = get_current_user_id();
-			$user_origin_city = get_user_meta( $user_id, 'origin_city', true );
 
 			// Modify the existing meta query or add a new one
 			$meta_query = $query->get( 'meta_query' );
