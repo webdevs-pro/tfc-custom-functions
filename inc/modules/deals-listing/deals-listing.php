@@ -16,117 +16,10 @@ class TFC_Deals_Listing {
 		add_shortcode( 'tfc_deals_listing_item_image', array( $this, 'deals_listing_item_image' ) );
 		add_shortcode( 'tfc_deal_city_and_country', array( $this, 'deal_city_and_country' ) );
 		add_shortcode( 'tfc_deal_tags', array( $this, 'deal_tags' ) );
-		add_action( 'elementor/query/query_results', array( $this, 'loop_grid_deals_order_filter' ), 10, 2);
+		add_shortcode( 'tfc_deal_display_price', array( $this, 'deal_price' ) );
+		add_action( 'elementor/query/query_results', array( $this, 'loop_grid_deals_results_filter' ), 10, 2);
+		add_action( 'elementor/query/deals_query', array( $this, 'loop_grid_deals_query_filter' ), 10, 2);
 	}
-
-/*
-	public function deals_listing_shortcode() {
-
-		global $post_counter;
-
-		// Ensure to include necessary WordPress functions
-		if ( ! function_exists( 'wp_date' ) ) {
-			require_once( ABSPATH . 'wp-includes/functions.php' );
-		}
-
-		// Get the current date in the required format
-		$current_date = wp_date('Ymd');
-
-		// Define the query arguments
-		$args = array(
-			'post_type' => 'deal',
-			'posts_per_page' => 9,
-			// 'meta_query' => array(
-			// 	array(
-			// 		'key' => 'deal_found_on',
-			// 		'value' => $current_date,
-			// 		'compare' => '='
-			// 	)
-			// )
-		);
-
-		
-		if ( function_exists( 'get_field' ) ) {
-			$template_id = get_field( 'deals_loop_item_template', 'option' );
-		} else {
-			return 'ACF plugin not activated';
-		}
-
-		if ( ! $template_id ) {
-			return 'Please select loop item template.';
-		}
-
-		$post_counter = 1;
-
-
-		// Execute the query
-		$query = new WP_Query( $args );
-
-
-		// Function to sort posts by 'tier'
-		usort( $query->posts, function( $a, $b ) {
-			$tier_a = get_post_meta( $a->ID, 'tier', true );
-			$tier_b = get_post_meta( $b->ID, 'tier', true );
-		
-			if ( $tier_a === $tier_b ) {
-				return 0;
-			}
-		
-			return ( $tier_a === 'free' ) ? -1 : 1;
-		} );
-
-		ob_start();
-
-		
-			if ( $query->have_posts() ) {
-				echo '<div class="deals-grid">';
-
-					while ( $query->have_posts() ) {
-						$query->the_post();
-
-						if ( $post_counter === 1 ) {
-							// Output lopp CSS only once on page
-							echo \Elementor\Plugin::instance()->frontend->get_builder_content_for_display( $template_id, true );
-						} else {
-							echo \Elementor\Plugin::instance()->frontend->get_builder_content_for_display( $template_id, false );
-						}
-
-						$post_counter++;
-					}
-					// Restore original post data
-					wp_reset_postdata();
-
-				echo '</div>';
-			} else {
-				// No posts found
-				echo '<p>No deals found for today.</p>';
-			}
-
-				
-			?>
-			<style>
-				.deals-grid {
-					display: grid;
-					grid-template-columns: 1fr 1fr 1fr;
-					gap: 24px;
-				}
-				@media(max-width: 1024px) and (min-width:768px) {
-					.deals-grid {
-						grid-template-columns: 1fr 1fr;
-					}
-				}
-				@media(max-width:767px) {
-					.deals-grid {
-						grid-template-columns: 1fr;
-					}
-				}
-			</style>
-
-			<?php
-
-		return ob_get_clean();
-	}
-*/
 
 
 	public function deals_listing_item_button() {
@@ -361,15 +254,99 @@ class TFC_Deals_Listing {
 
 
 
-	public function loop_grid_deals_order_filter( $query, $widget ) {
+	public function deal_price() {
+		$post_id = get_the_ID();
 
+		$price = (string) get_post_meta( $post_id, 'price', true );
+		$price = preg_replace( '/\D/', '', $price );
+		
+		$currency = get_post_meta( $post_id, 'currency', true );
+		
+		switch ( $currency ) {
+			case 'USD':
+				$price_string = '$' . $price;
+				break;
+
+			case 'GBP':
+				$price_string = '£' . $price;
+				break;
+
+			case 'EUR':
+				$price_string = '€' . $price;
+				break;
+			
+			default:
+				$price_string = '$';
+				break;
+		}
+			
+
+		return $price_string;
+	}
+
+
+
+
+
+
+
+	public function loop_grid_deals_query_filter( $query, $widget ) {
+
+		if ( is_user_logged_in() ) {
+			// Get the current user's 'origin_city' meta field
+			$user_id = get_current_user_id();
+			$user_origin_city = get_user_meta( $user_id, 'origin_city', true );
+
+			// Modify the existing meta query or add a new one
+			$meta_query = $query->get( 'meta_query' );
+
+			if ( ! is_array( $meta_query ) ) {
+				$meta_query = array();
+			}
+
+			// Add our custom meta query
+			$meta_query[] = array(
+				'key'     => 'origin',
+				'value'   => $user_origin_city,
+				'compare' => '='
+			);
+
+			// Update the query's meta query
+			$query->set( 'meta_query', $meta_query );
+
+		} else {
+			// For non-logged-in users, show random posts with the current publish date
+			$query->set( 'orderby', 'rand' );
+
+			$query->set( 'date_query', array(
+				'relation' => 'OR',
+				array(
+					'year'  => date('Y'),
+					'month' => date('m'),
+					'day'   => date('d'),
+				),
+				array(
+					'year'  => date('Y', strtotime('-1 day')),
+					'month' => date('m', strtotime('-1 day')),
+					'day'   => date('d', strtotime('-1 day')),
+				)
+			));
+		}
+
+		return $query;
+	}
+
+
+
+
+
+	public function loop_grid_deals_results_filter( $query, $widget ) {
 		$settings = $widget->get_settings();
 		$query_id = $settings['post_query_query_id'];
 
 		if ( $query_id != 'deals_query' ) {
 			return $query;
 		}
-
 
 		// Function to sort posts by 'tier'
 		usort( $query->posts, function( $a, $b ) {
@@ -386,6 +363,5 @@ class TFC_Deals_Listing {
 
 		return $query;
 	}
-
-}
+}  
 new TFC_Deals_Listing();
