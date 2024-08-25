@@ -102,7 +102,7 @@ class TFC_Deals_Listing {
 	private function render_become_a_member_button( $post_id ) {
 		$this->render_deal_dates( $post_id );
 
-		echo '<a class="tfc-loop-subscribe" href="/subscribe-london" role="button">Become a Free Member</a>';
+		echo '<a class="tfc-loop-subscribe" href="/signup" role="button">Become a Free Member</a>';
 	}
 
 
