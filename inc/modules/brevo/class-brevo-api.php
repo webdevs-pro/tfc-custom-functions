@@ -88,7 +88,7 @@ class TFC_Brevo_API {
 		$campaigns_api = new EmailCampaignsApi( new Client(), $config );
 		$lists_api = new ListsApi( new Client(), $config );
 
-		$this->maybe_add_new_origin_city_term( $origin_city );
+		tfc_maybe_add_new_origin_city_term( $origin_city );
 
 		try {
 			// Step 2: Fetch contacts from the specified segment and filter by city
@@ -134,7 +134,7 @@ class TFC_Brevo_API {
 
 			// Step 4: Add contacts to the temporary list
 			$add_contacts = new AddContactToList(array('emails' => $filtered_emails));
-			$lists_api->addContactToList($list_id, $add_contacts);
+			$lists_api->addContactToList( $list_id, $add_contacts );
 
 			// Step 5: Create the email campaign
 			$campaign = new CreateEmailCampaign();
@@ -145,11 +145,12 @@ class TFC_Brevo_API {
 				'name'  => get_bloginfo( 'name' ),
 				'email' => 'hello@tomsflightclub.com'
 			) ) );
+			$campaign->setReplyTo( 'hello@tomsflightclub.com' );
 
 			// Step 6: Set the campaign recipients using the temporary list
 			$recipients = new CreateEmailCampaignRecipients();
-			$recipients->setListIds(array($list_id));
-			$campaign->setRecipients($recipients);
+			$recipients->setListIds( array( $list_id ) );
+			$campaign->setRecipients( $recipients );
 
 			// Step 7: Create the campaign
 			$response = $campaigns_api->createEmailCampaign( $campaign );
@@ -157,8 +158,6 @@ class TFC_Brevo_API {
 
 			// Step 8: Send the campaign immediately
 			$response = $campaigns_api->sendEmailCampaignNow( $campaign_id );
-
-			//   echo '<pre>' . print_r($response, true) . '</pre><br>';
 
 
 			// Step 9: Remove the temporary list
@@ -169,24 +168,6 @@ class TFC_Brevo_API {
 		} catch ( Exception $e ) {
 			// Log the exception message
 			error_log( sprintf( __( 'Exception when creating campaign: %s', 'myplugin' ), $e->getMessage() ) );
-		}
-	}
-
-	private function maybe_add_new_origin_city_term( $origin_city ) {
-		// Check if the term exists in the 'origin-city' taxonomy
-		$term_exists = term_exists( $origin_city, 'origin-city' );
-
-		if ( $term_exists === null ) {
-			// The term does not exist, so let's add it
-			$new_term = wp_insert_term( $origin_city, 'origin-city' );
-
-			if ( is_wp_error( $new_term ) ) {
-				// Handle the error if the term could not be added
-				error_log( 'Failed to add origin city term: ' . $new_term->get_error_message() );
-			} else {
-				$term_id = $new_term['term_id'];
-				error_log( 'Added origin city term: ' . $new_term['name'] );
-			}
 		}
 	}
 	

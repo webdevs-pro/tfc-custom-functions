@@ -147,11 +147,30 @@ function tfc_on_update_user_meta( $meta_id, $object_id, $meta_key, $meta_value )
 		$brevo = new TFC_Brevo_API;
 		$brevo->update_contact( $user_email, $data );
 	}
-	
 
 }
 
 
+
+
+// Hook into the post meta updates for the 'deal' CPT.
+add_action( 'updated_post_meta', 'check_origin_update', 10, 4 );
+add_action( 'added_post_meta', 'check_origin_update', 10, 4 );
+
+/**
+ * Function to act upon updating the 'origin' meta field.
+ *
+ * @param int    $meta_id     ID of the updated metadata entry.
+ * @param int    $post_id     Post ID.
+ * @param string $meta_key    Meta key.
+ * @param mixed  $meta_value  Meta value.
+ */
+function check_origin_update( $meta_id, $post_id, $meta_key, $meta_value ) {
+	// Check if the updated meta is 'origin' and belongs to a 'deal' post type.
+	if ( 'origin' === $meta_key && 'deal' === get_post_type( $post_id ) ) {
+		tfc_maybe_add_new_origin_city_term( $meta_value )
+	}
+}
 
 
 
@@ -422,6 +441,7 @@ function tfc_register_user_form_shortcode( $atts ) {
 		}
 		?>
 	</div>
+	<div class="tfc-login-text">If you have already signed up, you will need to <a href="https://tomsflightclub.com/login">login to your account</a></div>
 
 
 	<script>
@@ -460,6 +480,7 @@ function tfc_register_user_form_shortcode( $atts ) {
 			padding: 16px 0;
 			width: 100%;
 			line-height: 1;
+			border: none;
 		}
 		.error-messages {
 			margin-top: 10px;
@@ -469,10 +490,38 @@ function tfc_register_user_form_shortcode( $atts ) {
 			color: red;
 			font-size: 14px;
 		}
+		.tfc-login-text {
+			font-size: 13px;
+			text-align: center;
+		}
+		.tfc-login-text a {
+			text-decoration: underline;
+			color: inherit;
+		}
 	</style>
 
 	<?php
 	return ob_get_clean();
 }
 add_shortcode( 'tfc_register_form', 'tfc_register_user_form_shortcode' );
+
+
+
+function tfc_maybe_add_new_origin_city_term( $origin_city ) {
+	// Check if the term exists in the 'origin-city' taxonomy
+	$term_exists = term_exists( $origin_city, 'origin-city' );
+
+	if ( $term_exists === null ) {
+		// The term does not exist, so let's add it
+		$new_term = wp_insert_term( $origin_city, 'origin-city' );
+
+		if ( is_wp_error( $new_term ) ) {
+			// Handle the error if the term could not be added
+			error_log( 'Failed to add origin city term: ' . $new_term->get_error_message() );
+		} else {
+			$term_id = $new_term['term_id'];
+			error_log( 'Added origin city term: ' . $new_term['name'] );
+		}
+	}
+}
 

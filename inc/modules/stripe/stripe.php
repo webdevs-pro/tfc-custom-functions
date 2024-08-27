@@ -115,8 +115,8 @@ class TFC_Stripe {
 					<a href="/subscribe" id="manage-subscription">Become a Premium Member</a>
 				<?php } else { ?>
 					<?php if ( $subscription_status == 'active' ) { ?>
-						<a href="https://billing.stripe.com/p/login/test_14k5la9bf1j40mc8ww?user_email=<?php echo $current_user->user_email ; ?>" id="manage-subscription">Manage Subscription</a>
-						<a href="https://billing.stripe.com/p/login/test_14k5la9bf1j40mc8ww?user_email=<?php echo $current_user->user_email ; ?>" id="cancel-subscription">Cancel Plan</a>
+						<a href="https://billing.stripe.com/p/login/28o2bicRvdkYfUQ9AA?user_email=<?php echo $current_user->user_email ; ?>" id="manage-subscription">Manage Subscription</a>
+						<a href="https://billing.stripe.com/p/login/28o2bicRvdkYfUQ9AA?user_email=<?php echo $current_user->user_email ; ?>" id="cancel-subscription">Cancel Plan</a>
 					<?php } else if ( $subscription && $subscription_status != 'active' ) { ?>
 						<a href="/subscribe" id="manage-subscription">Become a Premium Member</a>
 					<?php } ?>

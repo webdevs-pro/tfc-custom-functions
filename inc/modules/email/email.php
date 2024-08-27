@@ -45,7 +45,7 @@ class TFC_Email {
 		$origin_city = sanitize_text_field( $parameters['Origin City'] );
 		$subscription_type = 2; // Free
 		$campaign_name = $origin_city . ' ' . date('jS F') . ' (free) ' . date("Y-m-d H:i:s");
-		$subject = date('jS F') . ' Edition';
+		$subject = $origin_city . ' cheap flights on ' . date('jS F');
 		$content = $this->get_email_body( $request, 'free' );
 		
 		$brevo = new TFC_Brevo_API;
@@ -61,7 +61,7 @@ class TFC_Email {
 		$origin_city = sanitize_text_field( $parameters['Origin City'] );
 		$subscription_type = 1; // Paid
 		$campaign_name = $origin_city . ' ' . date('jS F') . ' (paid) ' . date("Y-m-d H:i:s");
-		$subject = date('jS F') . ' Edition';
+		$subject = $origin_city . ' cheap flights on ' . date('jS F');
 		$content = $this->get_email_body( $request, 'paid' );
 		
 		$brevo = new TFC_Brevo_API;
