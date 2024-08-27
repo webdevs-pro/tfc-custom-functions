@@ -168,7 +168,7 @@ add_action( 'added_post_meta', 'check_origin_update', 10, 4 );
 function check_origin_update( $meta_id, $post_id, $meta_key, $meta_value ) {
 	// Check if the updated meta is 'origin' and belongs to a 'deal' post type.
 	if ( 'origin' === $meta_key && 'deal' === get_post_type( $post_id ) ) {
-		tfc_maybe_add_new_origin_city_term( $meta_value )
+		tfc_maybe_add_new_origin_city_term( $meta_value );
 	}
 }
 
@@ -251,6 +251,69 @@ add_action( 'wp_body_open', function() {
 }, 99 );
 
 
+
+
+
+/**
+ * Add GTM tracking code to the wp_body_open hook.
+ */
+add_action( 'wp_body_open', 'tfc_add_gtm_tracking_code' );
+function tfc_add_gtm_tracking_code() {
+	// Get the Stripe secret API key from the ACF option page
+	$stripe_secret_key = get_field('stripe_secret_api_key', 'option');
+	
+	// Set your secret API key
+	\Stripe\Stripe::setApiKey( $stripe_secret_key );
+
+	// Assuming session_id is passed as a query parameter in the URL
+	if ( isset($_GET['session_id']) ) {
+		$session_id = sanitize_text_field( wp_unslash( $_GET['session_id'] ) );
+
+		// Retrieve the Checkout Session
+		$session = \Stripe\Checkout\Session::retrieve( $session_id );
+
+		// Retrieve the Subscription
+		$subscription_id = $session->subscription;
+		$subscription = \Stripe\Subscription::retrieve($subscription_id);
+
+		// Get the price ID from the subscription
+		$price_id = $subscription->items->data[0]->price->id;
+
+		// Retrieve the Price to get product details
+		$price = \Stripe\Price::retrieve( $price_id );
+
+		// Retrieve the Product
+		$product = \Stripe\Product::retrieve( $price->product );
+
+		// Prepare data for GTM tracking code
+		$currency = strtoupper( $price->currency );
+		$value = $price->unit_amount / 100;
+		$transaction_id = $session->id;
+		$item_name = $product->name;
+		$item_id = $price_id; // Or any specific ID you wish to use
+		$quantity = 1; // Adjust if needed
+
+		?>
+		<script>
+			window.dataLayer = window.dataLayer || [];
+			window.dataLayer.push({
+					event: 'purchase',
+					ecommerce: {
+						currency: '<?php echo esc_js( $currency ); ?>',
+						value: <?php echo esc_js( $value ); ?>,
+						transaction_id: '<?php echo esc_js( $transaction_id ); ?>',
+						items: [{
+							item_name: '<?php echo esc_js( $item_name ); ?>',
+							item_id: '<?php echo esc_js( $item_id ); ?>',
+							price: '<?php echo esc_js( $value ); ?>',
+							quantity: '<?php echo esc_js( $quantity ); ?>'
+						}]
+					}
+			});
+		</script>
+		<?php
+	}
+}
 
 
 

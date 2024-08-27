@@ -12,7 +12,6 @@ class TFC_Stripe {
 		add_action( 'acf/render_field/name=subscription', array( $this, 'after_subscription_field' ), 20, 1 );
 		add_shortcode( 'tfc_subscription', array( $this, 'subscription_shortcode' ) );
 		add_shortcode( 'stripe_url', array( $this, 'generate_stripe_url_with_email' ) );
-
 	}
 
 	public function register_rest_route() {
