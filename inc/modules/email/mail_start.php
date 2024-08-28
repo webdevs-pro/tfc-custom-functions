@@ -191,12 +191,6 @@
 
       <div style="width: 100%; table-layout:fixed; background-color: #E5E5E5; color:#3d3d3d; font-family: 'Lato', Arial, Helvetica, sans-serif; font-size: 16px; margin: 0 auto 40px;">
          <div style="max-width: 600px; background-color: #E5E5E5; color:#3d3d3d; font-family: 'Lato', Arial, Helvetica, sans-serif; font-size: 16px; margin: 0 auto;">
-
-            <div style="font-size: 0px;  color:#333333; mso-line-height-rule: exactly; line-height: 0px; display: none; max-width: 0px; max-height: 0px; opacity: 0; overflow: hidden; mso-hide:all;">
-               This is our preheader text which can be 35-190 characters but 85-100 is recommended.
-               <!-- Add Preheader Text Here (85-100 characters in length) -->
-               &zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;&zwnj;&nbsp;&#847;
-            </div>
          
             <!--[if mso]>
                <table width="600" align="center" style="border-spacing: 0; border-collapse:collapse; color: #3d3d3d;" role="presentation">
