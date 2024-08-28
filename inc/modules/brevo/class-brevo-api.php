@@ -146,7 +146,7 @@ class TFC_Brevo_API {
 				'email' => 'hello@tomsflightclub.com'
 			) ) );
 			$campaign->setReplyTo( 'hello@tomsflightclub.com' );
-			$campaign->setPreviewText( 'Today we have 9 amazing deals from ' . $origin_city . ' for you' );
+			$campaign->setPreviewText( 'Today we have 9 amazing deals from ' . $origin_city . ' for you!' );
 
 			// Step 6: Set the campaign recipients using the temporary list
 			$recipients = new CreateEmailCampaignRecipients();
