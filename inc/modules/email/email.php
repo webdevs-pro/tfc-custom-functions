@@ -107,7 +107,7 @@ class TFC_Email {
 
 				<table style="border-spacing:0; max-width: 548px; height: auto;" role="presentation">
 					<tr>
-						<td class="darkmode-transparent" width="548" class="two-columns" style="padding:0;font-size:0;text-align: center;  border-radius: 10px;">
+						<td width="548" class="two-columns darkmode-transparent" style="padding:0;font-size:0;text-align: center;  border-radius: 10px;">
 
 							<!-- left column -->
 							<table class="left-column" style="border-spacing:0;vertical-align:top;width:100%;max-width:240px;display:inline-block;" role="presentation">
@@ -117,8 +117,11 @@ class TFC_Email {
 										<table class="content" style="border-spacing:0;text-align: left;" role="presentation">
 											<tr>
 												<td style="padding:0px;">
-													<a  href="https://tomsflightclub.com/" target="_blank">
-														<img class="imgsize" src="<?php echo esc_url( $deal_data['Deal City Image'] ); ?>" width="220" alt="" style="border:0;width:100%;max-width:220px;height:auto;display:block; border-radius: 10px;">
+													<?php
+														$alt_text = $deal_data['Origin City'] . ' to ' . $deal_data['Destination City'] . ' flight for ' . ( new DateTime( $deal_data['Date'] ) )->format( 'F' );
+													?>
+													<a href="https://tomsflightclub.com/" target="_blank">
+														<img class="imgsize" src="<?php echo esc_url( $deal_data['Deal City Image'] ); ?>" alt="<?php echo sanitize_text_field( $alt_text ); ?>" width="220" style="border:0;width:100%;max-width:220px;height:auto;display:block; border-radius: 10px;">
 													</a>
 												</td>
 											</tr>

@@ -8,7 +8,13 @@
 	"require": {
 		"yahnis-elsts/plugin-update-checker": "dev-master",
 		"getbrevo/brevo-php": "^1.0",
-		"stripe/stripe-php": "^10.0"
+		"stripe/stripe-php": "^10.0",
+		"woocommerce/action-scheduler": "^3.6"
+	},
+	"autoload": {
+		"files": [
+			"inc/vendor/woocommerce/action-scheduler/action-scheduler.php"
+		]
 	},
 	"config": {
 		"vendor-dir": "inc/vendor"

@@ -84,6 +84,11 @@
                background-color: transparent !important;
             }
          }
+         @media (prefers-color-scheme: dark) {
+            [data-ogsc] .darkmode-transparent {
+               background-color: #fff !important;
+            }
+         }
 
          @media only screen and (max-width:600px) {
             .wrapper {
@@ -207,6 +212,14 @@
                   </td>
                </tr>
                <!--End Header-->
+
+
+               <!--View deals button-->
+               <tr>
+                  <td style="padding:20px 0; color:#333333; font-family:'Inter', Arial, sans-serif; font-size:16px;text-align: center;">
+                  <a href="https://tomsflightclub.com/" target="_blank" style="font-size: 14px;font-weight: normal;text-decoration: none;color: #ffffff;background-color: #415BE7;border:1px solid #263EC4;border-radius:10px;padding:10px 18px;display: inline-block; font-family: 'Inter', Arial, sans-serif;">View Deals on Website</a>
+                  </td>
+               </tr>
 
 
                <!--Header Text-->

@@ -588,3 +588,41 @@ function tfc_maybe_add_new_origin_city_term( $origin_city ) {
 	}
 }
 
+
+
+
+
+
+
+function add_custom_fields_to_reset_password_form() {
+	?>
+	<p>
+		 <label for="first_name"><?php esc_html_e('First Name'); ?></label>
+		 <input type="text" name="first_name" id="first_name" class="input" required/>
+	</p>
+	<p>
+		 <label><?php esc_html_e('Choose an option'); ?></label><br />
+		 <label><input type="radio" name="custom_option" value="option1" /> <?php esc_html_e('Option 1'); ?></label><br />
+		 <label><input type="radio" name="custom_option" value="option2" /> <?php esc_html_e('Option 2'); ?></label><br />
+		 <label><input type="radio" name="custom_option" value="option3" /> <?php esc_html_e('Option 3'); ?></label>
+	</p>
+	<?php
+}
+add_action('resetpass_form', 'add_custom_fields_to_reset_password_form');
+
+
+function save_custom_fields_on_password_reset( $user, $new_pass ) {
+	if ( isset( $_POST['first_name'] ) ) {
+		 update_user_meta( $user->ID, 'first_name', sanitize_text_field( $_POST['first_name'] ) );
+	}
+
+	if ( isset( $_POST['custom_option'] ) ) {
+		 update_user_meta( $user->ID, 'custom_option', sanitize_text_field( $_POST['custom_option'] ) );
+	}
+}
+add_action('password_reset', 'save_custom_fields_on_password_reset', 10, 2);
+
+
+
+// Register the cleanup action with Action Scheduler
+add_action( 'tfc_cleanup_brevo_list_and_campaign', array( 'TFC_Brevo_API', 'cleanup_brevo_list_and_campaign' ), 10, 2 );

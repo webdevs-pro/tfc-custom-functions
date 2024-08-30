@@ -162,13 +162,58 @@ class TFC_Brevo_API {
 
 
 			// Step 9: Remove the temporary list
-			//   $lists_api->deleteList($list_id);
+			$this->schedule_cleanup_action( $list_id, $campaign_id );
 
 			// Log the success message
 			error_log( __( 'Campaign created and sent successfully!', 'myplugin' ) );
 		} catch ( Exception $e ) {
 			// Log the exception message
 			error_log( sprintf( __( 'Exception when creating campaign: %s', 'myplugin' ), $e->getMessage() ) );
+		}
+	}
+
+
+	/**
+	 * Schedules the cleanup action to delete the temporary list and campaign after one week.
+	 *
+	 * @param int $list_id
+	 * @param int $campaign_id
+	 */
+	private function schedule_cleanup_action( $list_id, $campaign_id ) {
+		if ( ! function_exists( 'as_enqueue_async_action' ) ) {
+			return;
+		}
+
+		// Schedule the cleanup action to run one week from now
+		as_enqueue_async_action( 'tfc_cleanup_brevo_list_and_campaign', array( 'list_id' => $list_id, 'campaign_id' => $campaign_id ), 7 * DAY_IN_SECONDS );
+	}
+
+
+	/**
+	 * Cleanup method to delete the temporary list and associated campaign.
+	 *
+	 * @param int $list_id
+	 * @param int $campaign_id
+	 */
+	public function cleanup_brevo_list_and_campaign( $list_id, $campaign_id ) {
+		$config = Configuration::getDefaultConfiguration()->setApiKey( 'api-key', $this->api_key );
+		$lists_api = new ListsApi( new Client(), $config );
+		$campaigns_api = new EmailCampaignsApi( new Client(), $config );
+
+		try {
+			// Get the list details before deleting
+			$list_details = $lists_api->getList( $list_id );
+			$list_name = $list_details->getName();
+
+			// Delete the list
+			$lists_api->deleteList( $list_id );
+
+			// Optionally, delete the campaign if required
+			$campaigns_api->deleteEmailCampaign( $campaign_id );
+
+			error_log( sprintf( __( 'Temporary list "%s" and campaign deleted successfully!', 'myplugin' ), $list_name ) );
+		} catch ( Exception $e ) {
+			error_log( sprintf( __( 'Exception when deleting list or campaign: %s', 'myplugin' ), $e->getMessage() ) );
 		}
 	}
 	
