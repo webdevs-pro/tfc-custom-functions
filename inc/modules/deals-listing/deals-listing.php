@@ -274,6 +274,10 @@ class TFC_Deals_Listing {
 			case 'EUR':
 				$price_string = '€' . $price;
 				break;
+
+			case 'CAD':
+				$price_string = 'C$' . $price;
+				break;
 			
 			default:
 				$price_string = '$';
