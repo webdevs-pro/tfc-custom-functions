@@ -184,8 +184,9 @@ class TFC_Brevo_API {
 			return;
 		}
 
-		// Schedule the cleanup action to run one week from now
-		as_enqueue_async_action( 'tfc_cleanup_brevo_list_and_campaign', array( 'list_id' => $list_id, 'campaign_id' => $campaign_id ), 7 * DAY_IN_SECONDS );
+		// Schedule the cleanup action to run one week (7 days) from now
+		$time = time() + DAY_IN_SECONDS; // Calculate the timestamp for one week later
+		as_schedule_single_action( $time, 'tfc_cleanup_brevo_list_and_campaign', array( 'list_id' => $list_id, 'campaign_id' => $campaign_id ), 'TFC' );
 	}
 
 
@@ -209,11 +210,46 @@ class TFC_Brevo_API {
 			$lists_api->deleteList( $list_id );
 
 			// Optionally, delete the campaign if required
-			$campaigns_api->deleteEmailCampaign( $campaign_id );
+			// $campaigns_api->deleteEmailCampaign( $campaign_id );
 
 			error_log( sprintf( __( 'Temporary list "%s" and campaign deleted successfully!', 'myplugin' ), $list_name ) );
 		} catch ( Exception $e ) {
 			error_log( sprintf( __( 'Exception when deleting list or campaign: %s', 'myplugin' ), $e->getMessage() ) );
+		}
+	}
+
+	public function delete_temp_lists() {
+		$config = Configuration::getDefaultConfiguration()->setApiKey( 'api-key', $this->api_key );
+		$lists_api = new ListsApi( new Client(), $config );
+
+		try {
+			// Fetch all lists
+			$limit = 50; // Number of lists to fetch per request
+			$offset = 0;
+			$lists_to_delete = array();
+
+			do {
+				// Get a batch of lists
+				$lists = $lists_api->getLists( $limit, $offset );
+
+				foreach ( $lists->getLists() as $list ) {
+						if ( strpos( $list['name'], 'Temp List' ) === 0 ) {
+							$lists_to_delete[] = $list['id'];
+						}
+				}
+
+				$offset += $limit;
+			} while ( count( $lists->getLists() ) === $limit );
+
+			// Delete the lists
+			foreach ( $lists_to_delete as $list_id ) {
+				$lists_api->deleteList( $list_id );
+				error_log( sprintf( __( 'Deleted temporary list with ID: %d', 'myplugin' ), $list_id ) );
+			}
+
+			error_log( __( 'All temporary lists have been deleted.', 'myplugin' ) );
+		} catch ( Exception $e ) {
+			error_log( sprintf( __( 'Exception when deleting temporary lists: %s', 'myplugin' ), $e->getMessage() ) );
 		}
 	}
 	

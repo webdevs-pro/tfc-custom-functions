@@ -625,4 +625,11 @@ add_action('password_reset', 'save_custom_fields_on_password_reset', 10, 2);
 
 
 // Register the cleanup action with Action Scheduler
-add_action( 'tfc_cleanup_brevo_list_and_campaign', array( 'TFC_Brevo_API', 'cleanup_brevo_list_and_campaign' ), 10, 2 );
+add_action( 'tfc_cleanup_brevo_list_and_campaign', function( $list_id, $campaign_id ) {
+	$brevo_api = new TFC_Brevo_API();
+	$brevo_api->cleanup_brevo_list_and_campaign( $list_id, $campaign_id );
+}, 10, 2 );
+
+
+// $brevo_api = new TFC_Brevo_API();
+// $brevo_api->delete_temp_lists();
