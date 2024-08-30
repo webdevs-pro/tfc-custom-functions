@@ -611,7 +611,12 @@ add_action('resetpass_form', 'add_custom_fields_to_reset_password_form');
 
 function save_custom_fields_on_password_reset( $user, $new_pass ) {
 	if ( isset( $_POST['first_name'] ) ) {
-		 update_user_meta( $user->ID, 'first_name', sanitize_text_field( $_POST['first_name'] ) );
+		update_user_meta( $user->ID, 'first_name', sanitize_text_field( $_POST['first_name'] ) );
+
+		$data['attributes']['FIRSTNAME'] = sanitize_text_field( $_POST['first_name'] );
+		
+		$brevo = new TFC_Brevo_API;
+		$brevo->update_contact( $user->user_email, $data );
 	}
 }
 add_action('password_reset', 'save_custom_fields_on_password_reset', 10, 2);

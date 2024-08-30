@@ -93,6 +93,15 @@ class TFC_User_Account {
 
 			update_user_meta( $current_user->ID, 'origin_city', $origin_city );
 
+			if ( $first_name || $last_name ) {
+				$data['attributes']['FIRSTNAME'] = $first_name;
+				$data['attributes']['LASTNAME'] = $last_name;
+
+				$brevo = new TFC_Brevo_API;
+				$brevo->update_contact( $current_user->user_email, $data );
+			}
+		
+
 	
 			// Update user password
 			if ( ! empty( $_POST['current_password'] ) && ! empty( $_POST['new_password'] ) && ! empty( $_POST['confirm_password'] ) ) {
