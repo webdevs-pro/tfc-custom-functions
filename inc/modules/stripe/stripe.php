@@ -157,6 +157,10 @@ class TFC_Stripe {
 				color: #415BE7;
 				font-weight: bold;
 				padding: 8px 24px;
+				transition: opacity 250ms;
+			}
+			#tfc-membership #manage-subscription:hover {
+				opacity: 0.8;
 			}
 			#tfc-membership #cancel-subscription {
 				color: #BE0000;

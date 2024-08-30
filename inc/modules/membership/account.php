@@ -81,12 +81,14 @@ class TFC_User_Account {
 			$current_user = wp_get_current_user();
 			$errors = [];
 	
-			$nickname = isset( $_POST['full_name'] ) ? sanitize_text_field( wp_unslash( $_POST['full_name'] ) ) : '';
+			$first_name = isset( $_POST['first_name'] ) ? sanitize_text_field( wp_unslash( $_POST['first_name'] ) ) : '';
+			$last_name = isset( $_POST['last_name'] ) ? sanitize_text_field( wp_unslash( $_POST['last_name'] ) ) : '';
 			$origin_city = isset( $_POST['origin_city'] ) ? sanitize_text_field( wp_unslash( $_POST['origin_city'] ) ) : '';
 	
 			wp_update_user( array(
 				'ID' => $current_user->ID,
-				'nickname' => $nickname,
+				'first_name' => $first_name,
+				'last_name' => $last_name,
 			) );
 
 			update_user_meta( $current_user->ID, 'origin_city', $origin_city );
@@ -201,10 +203,17 @@ class TFC_User_Account {
 						<input type="text" id="email" name="email" disabled value="<?php echo esc_attr( $current_user->user_email ); ?>" />
 					</p>
 
-					<p>
-						<label for="first_name">Full Name</label>
-						<input type="text" id="full_name" name="full_name" value="<?php echo esc_attr( $current_user->nickname ); ?>" />
-					</p>
+					<div style="display: flex; gap: 10px;">
+						<p>
+							<label for="first_name">First Name</label>
+							<input type="text" id="first_name" name="first_name" value="<?php echo esc_attr( $current_user->first_name ); ?>" />
+						</p>
+
+						<p>
+							<label for="last_name">Surname</label>
+							<input type="text" id="last_name" name="last_name" value="<?php echo esc_attr( $current_user->last_name ); ?>" />
+						</p>
+					</div>
 
 					<p>
 						<label for="origin_city">Origin City</label>
@@ -298,6 +307,10 @@ class TFC_User_Account {
 				color: #fff;
 				font-weight: bold;
 				padding: 8px 24px;
+				transition: opacity 250ms;
+			}
+			#tfc-account #update-account:hover {
+				opacity: 0.8;
 			}
 
 			#tfc-account .notice {

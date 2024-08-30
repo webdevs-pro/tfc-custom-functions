@@ -490,7 +490,7 @@ function tfc_register_user_form_shortcode( $atts ) {
 		<?php
 		// Check if the 'email-exists' parameter is set and display an error message.
 		if ( isset( $_GET['email-exists'] ) && 'true' === $_GET['email-exists'] ) {
-				echo '<p class="error-message">This email is already registered. Please use a different email.</p>';
+				echo '<p class="error-message">This email is already registered. Please use a different email or <a href="/login">Sign in here</a> if you already have an account.</p>';
 		}
 
 		// Check if the 'city-not-exists' parameter is set and display an error message.
@@ -504,8 +504,6 @@ function tfc_register_user_form_shortcode( $atts ) {
 		}
 		?>
 	</div>
-	<div class="tfc-login-text">If you have already signed up, you will need to <a href="https://tomsflightclub.com/login">login to your account</a></div>
-
 
 	<script>
 		// JavaScript to remove error URL parameters after page load
@@ -544,6 +542,10 @@ function tfc_register_user_form_shortcode( $atts ) {
 			width: 100%;
 			line-height: 1;
 			border: none;
+			transition: opacity 250ms;
+		}
+		.tfc-signup-form input[type="submit"]:hover {
+			opacity: 0.8;
 		}
 		.error-messages {
 			margin-top: 10px;
@@ -553,13 +555,9 @@ function tfc_register_user_form_shortcode( $atts ) {
 			color: red;
 			font-size: 14px;
 		}
-		.tfc-login-text {
-			font-size: 13px;
-			text-align: center;
-		}
-		.tfc-login-text a {
-			text-decoration: underline;
+		.error-message a {
 			color: inherit;
+			text-decoration: underline;
 		}
 	</style>
 
@@ -595,16 +593,16 @@ function tfc_maybe_add_new_origin_city_term( $origin_city ) {
 
 
 function add_custom_fields_to_reset_password_form() {
+	error_log( "_GET\n" . print_r( $_GET, true ) . "\n" );
+
+	if ( ! isset( $_GET['wellcome'] ) || ! $_GET['wellcome'] ) {
+		return;
+	}
+
 	?>
 	<p>
 		 <label for="first_name"><?php esc_html_e('First Name'); ?></label>
 		 <input type="text" name="first_name" id="first_name" class="input" required/>
-	</p>
-	<p>
-		 <label><?php esc_html_e('Choose an option'); ?></label><br />
-		 <label><input type="radio" name="custom_option" value="option1" /> <?php esc_html_e('Option 1'); ?></label><br />
-		 <label><input type="radio" name="custom_option" value="option2" /> <?php esc_html_e('Option 2'); ?></label><br />
-		 <label><input type="radio" name="custom_option" value="option3" /> <?php esc_html_e('Option 3'); ?></label>
 	</p>
 	<?php
 }
@@ -614,10 +612,6 @@ add_action('resetpass_form', 'add_custom_fields_to_reset_password_form');
 function save_custom_fields_on_password_reset( $user, $new_pass ) {
 	if ( isset( $_POST['first_name'] ) ) {
 		 update_user_meta( $user->ID, 'first_name', sanitize_text_field( $_POST['first_name'] ) );
-	}
-
-	if ( isset( $_POST['custom_option'] ) ) {
-		 update_user_meta( $user->ID, 'custom_option', sanitize_text_field( $_POST['custom_option'] ) );
 	}
 }
 add_action('password_reset', 'save_custom_fields_on_password_reset', 10, 2);
@@ -670,4 +664,27 @@ function tfc_format_price_with_currency( $currency, $price ) {
 	}
 
 	return $price_string;
+}
+
+
+add_filter( 'wp_new_user_notification_email', 'tfc_customize_welcome_email', 10, 3 );
+function tfc_customize_welcome_email( $wp_new_user_notification_email, $user, $blogname ) {
+	// Generate the password reset URL with an additional parameter
+	$key = get_password_reset_key( $user );
+
+	$user_login = $user->user_login;
+	$reset_url = network_site_url( "wp-login.php?action=rp&key=$key&login=" . rawurlencode( $user_login ), 'login' );
+
+	// Add a custom parameter to the URL
+	$reset_url = add_query_arg( 'wellcome', 'true', $reset_url );
+
+	// Customize the email message
+	$message = "Thank you for registering at " . $blogname . ".\r\n\r\n";
+	$message .= "Username: " . $user->user_login . ",\r\n\r\n";
+	$message .= "To set your password, click the following link:\r\n";
+	$message .= $reset_url . "\r\n\r\n";
+
+	$wp_new_user_notification_email['message'] = $message;
+
+	return $wp_new_user_notification_email;
 }
