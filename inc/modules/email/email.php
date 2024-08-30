@@ -182,7 +182,13 @@ class TFC_Email {
 													<table border="0" cellpadding="0" cellspacing="0" role="presentation" style="border-spacing:0;">
 														<tr>
 															<td style="font-size: 16px; color: #415BE7; font-family: 'Inter', Arial, sans-serif; padding: 0 10px 0 0; font-weight: bold; border: 0;">
-																<?php echo sanitize_text_field( $deal_data['Currency and Price'] ); ?>
+																<?php
+																$price = $deal_data['Price'];
+																$currency = $deal_data['Currency'][0]['name'];
+																$formatted_price = tfc_format_price_with_currency( $currency, $price );
+																
+																echo sanitize_text_field( $formatted_price ); 
+																?>
 															</td>
 															<td align="center" style="border-radius:10px; font-size: 20px;background-color: #415BE7;" bgcolor="#415BE7" >
 																<?php if ( $button_type == 'link_to_deal' ) { ?>

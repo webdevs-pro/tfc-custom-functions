@@ -630,6 +630,44 @@ add_action( 'tfc_cleanup_brevo_list_and_campaign', function( $list_id, $campaign
 	$brevo_api->cleanup_brevo_list_and_campaign( $list_id, $campaign_id );
 }, 10, 2 );
 
-
 // $brevo_api = new TFC_Brevo_API();
 // $brevo_api->delete_temp_lists();
+
+
+
+/**
+ * Formats a price with a currency symbol.
+ *
+ * This function takes a currency code and a price, and returns a string
+ * formatted with the appropriate currency symbol.
+ *
+ * @param string $currency The currency code (e.g., 'USD', 'GBP', 'EUR', 'CAD').
+ * @param float|int $price The price amount to be formatted.
+ *
+ * @return string The formatted price string with the currency symbol.
+ */
+function tfc_format_price_with_currency( $currency, $price ) {
+	switch ( $currency ) {
+		case 'USD':
+			$price_string = '$' . $price;
+			break;
+
+		case 'GBP':
+			$price_string = '£' . $price;
+			break;
+
+		case 'EUR':
+			$price_string = '€' . $price;
+			break;
+
+		case 'CAD':
+			$price_string = 'C$' . $price;
+			break;
+		
+		default:
+			$price_string = '$' . $price;
+			break;
+	}
+
+	return $price_string;
+}

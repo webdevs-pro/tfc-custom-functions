@@ -256,36 +256,12 @@ class TFC_Deals_Listing {
 
 	public function deal_price() {
 		$post_id = get_the_ID();
-
 		$price = (string) get_post_meta( $post_id, 'price', true );
 		$price = preg_replace( '/\D/', '', $price );
-		
 		$currency = get_post_meta( $post_id, 'currency', true );
+		$formatted_price = tfc_format_price_with_currency( $currency, $price );
 		
-		switch ( $currency ) {
-			case 'USD':
-				$price_string = '$' . $price;
-				break;
-
-			case 'GBP':
-				$price_string = '£' . $price;
-				break;
-
-			case 'EUR':
-				$price_string = '€' . $price;
-				break;
-
-			case 'CAD':
-				$price_string = 'C$' . $price;
-				break;
-			
-			default:
-				$price_string = '$';
-				break;
-		}
-			
-
-		return $price_string;
+		return $formatted_price;
 	}
 
 
