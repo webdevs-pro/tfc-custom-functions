@@ -84,6 +84,7 @@ class TFC_User_Account {
 			$first_name = isset( $_POST['first_name'] ) ? sanitize_text_field( wp_unslash( $_POST['first_name'] ) ) : '';
 			$last_name = isset( $_POST['last_name'] ) ? sanitize_text_field( wp_unslash( $_POST['last_name'] ) ) : '';
 			$origin_city = isset( $_POST['origin_city'] ) ? sanitize_text_field( wp_unslash( $_POST['origin_city'] ) ) : '';
+			$mailing_frequency = isset( $_POST['mailing_frequency'] ) ? sanitize_text_field( wp_unslash( $_POST['mailing_frequency'] ) ) : '';
 	
 			wp_update_user( array(
 				'ID' => $current_user->ID,
@@ -92,10 +93,12 @@ class TFC_User_Account {
 			) );
 
 			update_user_meta( $current_user->ID, 'origin_city', $origin_city );
+			update_user_meta( $current_user->ID, 'mailing_frequency', $mailing_frequency );
 
-			if ( $first_name || $last_name ) {
+			if ( $first_name || $last_name || $mailing_frequency ) {
 				$data['attributes']['FIRSTNAME'] = $first_name;
 				$data['attributes']['LASTNAME'] = $last_name;
+				$data['attributes']['MAILING_FREQUENCY'] = $mailing_frequency;
 
 				$brevo = new TFC_Brevo_API;
 				$brevo->update_contact( $current_user->user_email, $data );
@@ -162,6 +165,8 @@ class TFC_User_Account {
 		}
 
 		$selected_origin_city = get_user_meta( $current_user->ID, 'origin_city', true );
+		$selected_mailing_frequency = get_user_meta( $current_user->ID, 'mailing_frequency', true );
+
 		$origin_city_terms    = get_terms( array(
 			'taxonomy' => 'origin-city',
 			'hide_empty' => false,
@@ -224,24 +229,51 @@ class TFC_User_Account {
 						</p>
 					</div>
 
-					<p>
-						<label for="origin_city">Origin City</label>
-						<select id="origin_city" name="origin_city">
-							<option value="" hidden>Select your origin city</option>
-							<?php
-							if ( ! empty( $origin_city_terms ) && ! is_wp_error( $origin_city_terms ) ) {
-								foreach ( $origin_city_terms as $term ) {
+					<div style="display: flex; gap: 10px;">
+						<p>
+							<label for="origin_city">Origin City</label>
+							<select id="origin_city" name="origin_city">
+								<option value="" hidden>Select your origin city</option>
+								<?php
+								if ( ! empty( $origin_city_terms ) && ! is_wp_error( $origin_city_terms ) ) {
+									foreach ( $origin_city_terms as $term ) {
+										printf(
+											'<option value="%s"%s>%s</option>',
+											esc_attr( $term->name ),
+											selected( strtolower( $selected_origin_city ), strtolower( $term->name ), false ),
+											esc_html( $term->name )
+										);
+									}
+								}
+								?>
+							</select>
+						</p>
+
+						<p>
+							<label for="mailing_frequency">Mailing Frequency</label>
+							<select id="mailing_frequency" name="mailing_frequency">
+								<option value="" hidden>Select mailing frequency</option>
+								<?php
+								$mailing_frequency_options = array(
+									'Daily',
+									'4 Days Per Week (Monday, Wednesday, Friday, Saturday)',
+									'3 Days Per Week (Monday, Wednesday, Friday)',
+									'Twice Per Week (Mondays and Thursdays)',
+									'Once Per Week (Mondays only)',
+								);
+
+								foreach ( $mailing_frequency_options as $mailing_frequency_option ) {
 									printf(
 										'<option value="%s"%s>%s</option>',
-										esc_attr( $term->name ),
-										selected( strtolower( $selected_origin_city ), strtolower( $term->name ), false ),
-										esc_html( $term->name )
+										esc_attr( $mailing_frequency_option ),
+										selected( strtolower( $selected_mailing_frequency ), strtolower( $mailing_frequency_option ), false ),
+										esc_html( $mailing_frequency_option )
 									);
 								}
-							}
-							?>
-						</select>
-					</p>
+								?>
+							</select>
+						</p>
+					</div>
 				</div>
 
 				<div class="password-filesds-toggle">Change password</div>
