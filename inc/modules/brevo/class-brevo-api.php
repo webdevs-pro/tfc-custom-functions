@@ -82,6 +82,12 @@ class TFC_Brevo_API {
 
 
 	public function create_brevo_campaign( $list_id, $origin_city, $subscription_type, $campaign_name, $subject, $content ) {
+		global $tfc_logger;
+
+		$log_data = array(
+			'name' => $campaign_name,
+		);
+
 		// Step 1: Initialize the Brevo API client
 		$config  = Configuration::getDefaultConfiguration()->setApiKey( 'api-key', $this->api_key );
 		$contacts_api = new ContactsApi( new Client(), $config );
@@ -122,10 +128,13 @@ class TFC_Brevo_API {
 				return;
 			}
 
-			error_log( "filtered_emails\n" . print_r( $filtered_emails, true ) . "\n" );
+			$log_data['emails'] = $filtered_emails;
+
 
 			// Step 3: Create a temporary list to hold the filtered contacts
 			$temp_list_name = 'Temp List ' . date("Y-m-d H:i:s");
+
+			$log_data['list'] = $temp_list_name;
 
 			$temp_folder_id = 28;
 			$list = new CreateList( array( 'name' => $temp_list_name, 'folderId' => $temp_folder_id) );
@@ -164,12 +173,18 @@ class TFC_Brevo_API {
 			// Step 9: Remove the temporary list
 			$this->schedule_cleanup_action( $list_id, $campaign_id );
 
+			
+			
 			// Log the success message
-			error_log( __( 'Campaign created and sent successfully!', 'myplugin' ) );
+			$log_data['status'] = 'Campaign created successfully!';
+
 		} catch ( Exception $e ) {
 			// Log the exception message
-			error_log( sprintf( __( 'Exception when creating campaign: %s', 'myplugin' ), $e->getMessage() ) );
+			$log_data['status'] = sprintf( 'Exception when creating campaign: %s', $e->getMessage() );
 		}
+
+		$tfc_logger->log( "Creating a new campaign:\n" . print_r( $log_data, true ) . "\n" );
+
 	}
 
 
@@ -197,9 +212,15 @@ class TFC_Brevo_API {
 	 * @param int $campaign_id
 	 */
 	public function cleanup_brevo_list_and_campaign( $list_id, $campaign_id ) {
+		global $tfc_logger;
+
+		$log_data = array(
+			'list_id' => $list_id,
+		);
+
 		$config = Configuration::getDefaultConfiguration()->setApiKey( 'api-key', $this->api_key );
 		$lists_api = new ListsApi( new Client(), $config );
-		$campaigns_api = new EmailCampaignsApi( new Client(), $config );
+		// $campaigns_api = new EmailCampaignsApi( new Client(), $config );
 
 		try {
 			// Get the list details before deleting
@@ -212,10 +233,14 @@ class TFC_Brevo_API {
 			// Optionally, delete the campaign if required
 			// $campaigns_api->deleteEmailCampaign( $campaign_id );
 
-			error_log( sprintf( __( 'Temporary list "%s" and campaign deleted successfully!', 'myplugin' ), $list_name ) );
+			$log_data['list_name'] = $list_name;
+
+			$log_data['status'] = 'List deleted successfully!';
 		} catch ( Exception $e ) {
-			error_log( sprintf( __( 'Exception when deleting list or campaign: %s', 'myplugin' ), $e->getMessage() ) );
+			$log_data['status'] =  sprintf( 'Exception when deleting list: %s', $e->getMessage() );
 		}
+
+		$tfc_logger->log( "Deleting an old list:\n" . print_r( $log_data, true ) . "\n" );
 	}
 
 	public function delete_temp_lists() {
@@ -233,9 +258,9 @@ class TFC_Brevo_API {
 				$lists = $lists_api->getLists( $limit, $offset );
 
 				foreach ( $lists->getLists() as $list ) {
-						if ( strpos( $list['name'], 'Temp List' ) === 0 ) {
-							$lists_to_delete[] = $list['id'];
-						}
+					if ( strpos( $list['name'], 'Temp List' ) === 0 ) {
+						$lists_to_delete[] = $list['id'];
+					}
 				}
 
 				$offset += $limit;

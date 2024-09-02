@@ -192,10 +192,11 @@ class TFC_Admin {
 
 			#tfc-log-output {
 				overflow: auto;
-				height: 280px;
+				height: 400px;
 				border: 1px solid #999999;
 				padding: 10px 10px 20px 10px;
 				background-color: #F5F5F5;
+				resize: vertical;
 			}
 
 			#tfc-scroll-to-bottom {
