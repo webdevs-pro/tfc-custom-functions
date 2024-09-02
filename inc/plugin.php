@@ -5,6 +5,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // require_once ( TFC_PLUGIN_DIR . '/inc/modules/elementor/elementor.php' );
+require_once ( TFC_PLUGIN_DIR . '/inc/modules/logger/logger.php' );
+require_once ( TFC_PLUGIN_DIR . '/inc/modules/admin/admin.php' );
 require_once ( TFC_PLUGIN_DIR . '/inc/modules/membership/user-registration.php' );
 require_once ( TFC_PLUGIN_DIR . '/inc/modules/membership/account.php' );
 require_once ( TFC_PLUGIN_DIR . '/inc/modules/deals-listing/deals-listing.php' );
@@ -371,6 +373,7 @@ function tfc_handle_user_registration() {
 				$data = array();
 				$data['attributes']['SUBSCRIPTION'] = 2; // Free
 				$data['attributes']['CITY'] = sanitize_text_field( $origin_city );
+				$data['listIds'] = [2];
 
 				$brevo = new TFC_Brevo_API;
 				$brevo->create_contact( $email, $data );
@@ -693,3 +696,6 @@ function tfc_customize_welcome_email( $wp_new_user_notification_email, $user, $b
 
 	return $wp_new_user_notification_email;
 }
+
+
+
