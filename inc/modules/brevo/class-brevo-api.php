@@ -141,9 +141,14 @@ class TFC_Brevo_API {
 			$list_response = $lists_api->createList( $list );
 			$list_id = $list_response->getId();
 
-			// Step 4: Add contacts to the temporary list
-			$add_contacts = new AddContactToList(array('emails' => $filtered_emails));
-			$lists_api->addContactToList( $list_id, $add_contacts );
+			// Step 4: Add contacts to the temporary list in batches of 150
+			$batch_size = 150;
+			$total_contacts = count( $filtered_emails );
+			for ( $i = 0; $i < $total_contacts; $i += $batch_size ) {
+				$batch = array_slice( $filtered_emails, $i, $batch_size );
+				$add_contacts = new AddContactToList( array( 'emails' => $batch ) );
+				$lists_api->addContactToList( $list_id, $add_contacts );
+			}
 
 			// Step 5: Create the email campaign
 			$campaign = new CreateEmailCampaign();
