@@ -168,7 +168,12 @@ class TFC_Email {
 															</td>
 
 															<td class="leftpad" style="border-radius:4px; font-size: 14px; padding: 0 0 0 6px; background-color: transparent;">                                           
-																<img width="20" style="vertical-align: middle; margin-right: 6px;" src="https://i.postimg.cc/fTgdL9WP/Plane.png"  alt="" /><span style="vertical-align: middle;" ><?php echo ( new DateTime( $deal_data['Outbound Date'] ) )->format( 'F jS' ); ?></span>
+																<img width="20" style="vertical-align: middle; margin-right: 6px;" src="https://i.postimg.cc/fTgdL9WP/Plane.png"  alt="" />
+																<?php if ( $button_type == 'link_to_deal' ) { ?>
+																	<span style="vertical-align: middle;" ><?php echo ( new DateTime( $deal_data['Outbound Date'] ) )->format( 'F jS' ); ?></span>
+																<?php } else if ( $button_type == 'subscribe_button' ) { ?>
+																	<span style="vertical-align: middle;" ><?php echo ( new DateTime( $deal_data['Outbound Date'] ) )->format( 'F Y' ); ?></span>
+																<?php } ?>
 															</td>
 														</tr>
 													</table>

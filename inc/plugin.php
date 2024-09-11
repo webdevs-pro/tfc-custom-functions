@@ -394,7 +394,7 @@ function tfc_handle_user_registration() {
 				$message = "<p>Ahoy Mate!</p>";
 				$message .= "<p>Just one more step before you can access the amazing deals on Tom's Flight Club.</p>";
 				$message .= "<p>I need you to click the link below (it's a magic login link - so you'll login to your Tom's Flight Club account with your email automatically):</p>";
-				$message .= "<p><a href='{$login_url}'>[CLICK HERE TO LOGIN]</a></p>";
+				$message .= "<p><a href='{$login_url}'>CLICK HERE TO LOGIN</a></p>";
 				$message .= "<p>You must do this, otherwise your account will not be created, and you will not get the best flight deals.</p>";
 				$message .= "<p>Cheers mate,<br>Tom</p>";
 
@@ -613,6 +613,8 @@ add_shortcode( 'tfc_register_form', 'tfc_register_user_form_shortcode' );
 
 
 function tfc_maybe_add_new_origin_city_term( $origin_city ) {
+	global $tfc_logger;
+
 	// Check if the term exists in the 'origin-city' taxonomy
 	$term_exists = term_exists( $origin_city, 'origin-city' );
 
@@ -622,10 +624,9 @@ function tfc_maybe_add_new_origin_city_term( $origin_city ) {
 
 		if ( is_wp_error( $new_term ) ) {
 			// Handle the error if the term could not be added
-			error_log( 'Failed to add origin city term: ' . $new_term->get_error_message() );
+			$tfc_logger->log( "Failed to add origin city term: " . $new_term->get_error_message() . "\n" );
 		} else {
-			$term_id = $new_term['term_id'];
-			error_log( 'Added origin city term: ' . $new_term['name'] );
+			$tfc_logger->log( "Added origin city term: " . $new_term['name'] . "\n" );
 		}
 	}
 }
@@ -637,7 +638,7 @@ function tfc_maybe_add_new_origin_city_term( $origin_city ) {
 
 
 function add_custom_fields_to_reset_password_form() {
-	error_log( "_GET\n" . print_r( $_GET, true ) . "\n" );
+	// error_log( "_GET\n" . print_r( $_GET, true ) . "\n" );
 
 	if ( ! isset( $_GET['wellcome'] ) || ! $_GET['wellcome'] ) {
 		return;
@@ -720,27 +721,27 @@ function tfc_format_price_with_currency( $currency, $price ) {
 }
 
 
-add_filter( 'wp_new_user_notification_email', 'tfc_customize_welcome_email', 10, 3 );
-function tfc_customize_welcome_email( $wp_new_user_notification_email, $user, $blogname ) {
-	// Generate the password reset URL with an additional parameter
-	$key = get_password_reset_key( $user );
+// add_filter( 'wp_new_user_notification_email', 'tfc_customize_welcome_email', 10, 3 );
+// function tfc_customize_welcome_email( $wp_new_user_notification_email, $user, $blogname ) {
+// 	// Generate the password reset URL with an additional parameter
+// 	$key = get_password_reset_key( $user );
 
-	$user_login = $user->user_login;
-	$reset_url = network_site_url( "wp-login.php?action=rp&key=$key&login=" . rawurlencode( $user_login ), 'login' );
+// 	$user_login = $user->user_login;
+// 	$reset_url = network_site_url( "wp-login.php?action=rp&key=$key&login=" . rawurlencode( $user_login ), 'login' );
 
-	// Add a custom parameter to the URL
-	$reset_url = add_query_arg( 'wellcome', 'true', $reset_url );
+// 	// Add a custom parameter to the URL
+// 	$reset_url = add_query_arg( 'wellcome', 'true', $reset_url );
 
-	// Customize the email message
-	$message = "Thank you for registering at " . $blogname . ".\r\n\r\n";
-	$message .= "Username: " . $user->user_login . ",\r\n\r\n";
-	$message .= "To set your password, click the following link:\r\n";
-	$message .= $reset_url . "\r\n\r\n";
+// 	// Customize the email message
+// 	$message = "Thank you for registering at " . $blogname . ".\r\n\r\n";
+// 	$message .= "Username: " . $user->user_login . ",\r\n\r\n";
+// 	$message .= "To set your password, click the following link:\r\n";
+// 	$message .= $reset_url . "\r\n\r\n";
 
-	$wp_new_user_notification_email['message'] = $message;
+// 	$wp_new_user_notification_email['message'] = $message;
 
-	return $wp_new_user_notification_email;
-}
+// 	return $wp_new_user_notification_email;
+// }
 
 
 
