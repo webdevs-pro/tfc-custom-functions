@@ -107,7 +107,7 @@ class TFC_Deals_Listing {
 
 
 	private function render_become_a_premium_member_button( $post_id ) {
-		$this->render_deal_dates( $post_id );
+		// $this->render_deal_dates( $post_id );
 		
 		echo '<a class="tfc-loop-subscribe" href="/subscribe" role="button">Become a Premium Member</a>';
 	}
