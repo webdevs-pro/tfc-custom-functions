@@ -706,6 +706,10 @@ function tfc_format_price_with_currency( $currency, $price ) {
 		case 'CAD':
 			$price_string = 'C$' . $price;
 			break;
+
+		case 'CHF':
+			$price_string = '₣' . $price;
+			break;
 		
 		default:
 			$price_string = '$' . $price;
