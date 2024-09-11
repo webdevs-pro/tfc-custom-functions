@@ -335,23 +335,20 @@ function tfc_add_gtm_tracking_code() {
  * Handle user registration form submission.
  *
  * This function processes the form submission, creates a new user with the role
- * of 'subscriber', sends the default WordPress welcome email, saves the selected
- * city to user meta, and redirects the user to a specified thank-you page with
- * the user ID encoded in Base64. If the email already exists or the selected city
- * is invalid, the user is redirected back to the form with appropriate error
- * messages.
+ * of 'subscriber', sends a custom welcome email with an auto-login link, saves the
+ * selected city to user meta, and redirects the user if necessary. If the email already
+ * exists or the selected city is invalid, the user is redirected back to the form with 
+ * appropriate error messages.
  */
 add_action( 'admin_post_nopriv_tfc_register_user', 'tfc_handle_user_registration' );
 add_action( 'admin_post_tfc_register_user', 'tfc_handle_user_registration' );
+
 function tfc_handle_user_registration() {
-	// Check the nonce and make sure the email is set.
 	if ( isset( $_POST['email'] ) && wp_verify_nonce( $_POST['tfc_nonce'], 'tfc_register_user' ) ) {
 		$email = sanitize_email( $_POST['email'] );
 		$origin_city = isset( $_POST['origin_city'] ) ? sanitize_text_field( $_POST['origin_city'] ) : '';
 
-		// Ensure the email is valid and not already registered.
 		if ( is_email( $email ) && ! email_exists( $email ) ) {
-			// Check if the selected city exists in the 'origin-city' taxonomy.
 			$city_exists = term_exists( $origin_city, 'origin-city' );
 
 			if ( $city_exists ) {
@@ -378,40 +375,84 @@ function tfc_handle_user_registration() {
 				$brevo = new TFC_Brevo_API;
 				$brevo->create_contact( $email, $data );
 
+				// Generate an auto-login link.
+				$token = wp_generate_password( 20, false ); // Generate a unique token.
+				update_user_meta( $user_id, 'tfc_auto_login_token', $token ); // Save token to user meta.
 
-				// Send the default welcome email.
-				wp_new_user_notification( $user_id, null, 'user' );
+				// Create the auto-login URL with the token.
+				$login_url = add_query_arg(
+					array(
+						'user_id' => $user_id,
+						'token'   => $token,
+					),
+					site_url( '/auto-login' )
+				);
 
-				// Get the redirect page slug from the form data.
+				$subject = "Tom's Flight Club - you're almost in...";
+
+				// Define the message in HTML format.
+				$message = "<p>Ahoy Mate!</p>";
+				$message .= "<p>Just one more step before you can access the amazing deals on Tom's Flight Club.</p>";
+				$message .= "<p>I need you to click the link below (it's a magic login link - so you'll login to your Tom's Flight Club account with your email automatically):</p>";
+				$message .= "<p><a href='{$login_url}'>[CLICK HERE TO LOGIN]</a></p>";
+				$message .= "<p>You must do this, otherwise your account will not be created, and you will not get the best flight deals.</p>";
+				$message .= "<p>Cheers mate,<br>Tom</p>";
+
+				// Set the email headers to send as HTML.
+				$headers = array( 'Content-Type: text/html; charset=UTF-8' );
+
+				// Send the email with the custom HTML message.
+				wp_mail( $email, $subject, $message, $headers );
+
+				// Redirect user to a custom thank-you page.
 				$redirect_page_slug = isset( $_POST['redirect_page_slug'] ) ? sanitize_text_field( $_POST['redirect_page_slug'] ) : 'thank-you';
-
-				// Redirect to the custom thank-you page with the encoded user ID.
 				$redirect_url = add_query_arg(
 					array(
 						'signup' => $user_id,
-						'email' => $email,
+						'email'  => $email,
 					),
 					site_url( '/' . $redirect_page_slug )
 				);
 				wp_redirect( $redirect_url );
 				exit;
 			} else {
-				// Redirect back to the form page with a 'city-not-exists' parameter.
 				$redirect_url = add_query_arg( 'city-not-exists', 'true', wp_get_referer() );
 				wp_redirect( $redirect_url );
 				exit;
 			}
 		} else {
-			// Redirect back to the form page with an 'email-exists' parameter.
 			$redirect_url = add_query_arg( 'email-exists', 'true', wp_get_referer() );
 			wp_redirect( $redirect_url );
 			exit;
 		}
 	} else {
-		// If nonce validation fails or email is missing, reload the form with an error.
 		$redirect_url = add_query_arg( 'registration', 'failed', wp_get_referer() );
 		wp_redirect( $redirect_url );
 		exit;
+	}
+}
+
+/**
+ * Handle auto-login via token.
+ */
+add_action( 'template_redirect', 'tfc_handle_auto_login' );
+function tfc_handle_auto_login() {
+	if ( isset( $_GET['user_id'] ) && isset( $_GET['token'] ) ) {
+		$user_id = absint( $_GET['user_id'] );
+		$token = sanitize_text_field( $_GET['token'] );
+
+		// Check if the user exists and verify the token.
+		$user = get_user_by( 'ID', $user_id );
+		if ( $user && get_user_meta( $user_id, 'tfc_auto_login_token', true ) === $token ) {
+			// Log the user in.
+			wp_set_auth_cookie( $user_id );
+			// Delete the token after use for security reasons.
+			delete_user_meta( $user_id, 'tfc_auto_login_token' );
+
+			// Redirect to the /account page.
+			wp_redirect( site_url( '/account' ) );
+			exit;
+		}
 	}
 }
 
