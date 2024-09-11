@@ -124,7 +124,7 @@ class TFC_Brevo_API {
 			} while ( count( $contacts->getContacts() ) === $limit );
 
 			if ( empty( $filtered_emails ) ) {
-				error_log( __( 'No contacts found for the specified criteria.', 'myplugin' ) );
+				$tfc_logger->log( "No contacts found for the specified criteria: City: {$origin_city}, Subscription: {$subscription_type}" . print_r( $log_data, true ) . "\n" );
 				return;
 			}
 

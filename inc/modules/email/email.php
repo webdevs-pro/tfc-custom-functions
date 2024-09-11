@@ -30,7 +30,7 @@ class TFC_Email {
 	}
 
 	public function generate_free_email_template( $request ) {
-		error_log( "generate_free_email_template\n" );
+		// error_log( "generate_free_email_template\n" );
 		/*
 		// Parameters structure
 		$parameters = array(
@@ -53,7 +53,7 @@ class TFC_Email {
 	}
 
 	public function generate_paid_email_template( $request ) {
-		error_log( "generate_paid_email_template\n" );
+		// error_log( "generate_paid_email_template\n" );
 
 		$parameters = $request->get_params();
 
