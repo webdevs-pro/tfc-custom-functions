@@ -141,7 +141,7 @@ class TFC_Email {
 											<!-- Origin to destination (item title) -->
 											<tr>
 												<td style="width: 100%; padding: 10px 10px 6px 0; background-color: transparent;">
-													<h1  style="font-size: 14px; color:#80889E; font-family: 'Inter', Arial, sans-serif; background-color: transparent;">
+													<h2  style="font-size: 14px; color:#80889E; font-family: 'Inter', Arial, sans-serif; background-color: transparent;">
 														<span class="darkmode-bg" style="color:#000000; font-size: 18px; font-weight: bold;">
 															<?php echo sanitize_text_field( $deal_data['Origin City'] ); ?>
 														</span>
@@ -149,7 +149,10 @@ class TFC_Email {
 														<span class="darkmode-bg" style="color:#000000; font-size: 18px; font-weight: bold;">
 															<?php echo sanitize_text_field( $deal_data['Destination City'] ); ?>
 														</span>
-													</h1>
+														<span class="darkmode-bg" style="color: #FFFFFF; font-size: 11px; line-height: 1em; font-weight: 500; padding: 3px 6px; background-color: #FF0000; border-radius: 5px 5px 5px 5px; vertical-align: middle; display: inline-block; margin-bottom: 4px;">
+															<?php echo sanitize_text_field( $deal_data['Destination Country'] ); ?>
+														</span>
+													</h2>
 
 													<h2 style="color:#80889E; font-family: 'Inter', Arial, sans-serif; font-size: 14px;padding: 4px 0 0 0; font-weight: normal;">
 														Found <span><?php echo ( new DateTime( $deal_data['Date'] ) )->format( 'F jS' ); ?></span>
