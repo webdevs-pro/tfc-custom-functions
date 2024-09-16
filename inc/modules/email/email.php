@@ -173,10 +173,63 @@ class TFC_Email {
 															<td class="leftpad" style="border-radius:4px; font-size: 14px; padding: 0 0 0 6px; background-color: transparent;">                                           
 																<img width="20" style="vertical-align: middle; margin-right: 6px;" src="https://i.postimg.cc/fTgdL9WP/Plane.png"  alt="" />
 																<?php if ( $button_type == 'link_to_deal' ) { ?>
-																	<span style="vertical-align: middle;" ><?php echo ( new DateTime( $deal_data['Outbound Date'] ) )->format( 'F jS' ); ?></span>
+																	<span style="vertical-align: middle;" >
+																	<?php if ( $button_type == 'link_to_deal' ) {
+																	$outbound_date = $deal_data['Outbound Date'];
+																	$return_date = $deal_data['Outbound Day'];
+
+																	$outbound_timestamp = strtotime( $outbound_date );
+																	$return_timestamp = strtotime( $return_date );
+
+																	$date_format = 'j M';
+																	echo date_i18n( $date_format, $outbound_timestamp ) . ' - ' . date_i18n( $date_format, $return_timestamp );
+																} ?>
+																	</span>
 																<?php } else if ( $button_type == 'subscribe_button' ) { ?>
 																	<span style="vertical-align: middle;" ><?php echo ( new DateTime( $deal_data['Outbound Date'] ) )->format( 'F Y' ); ?></span>
 																<?php } ?>
+															</td>
+														</tr>
+
+														<tr>
+															<td colspan="2" style="font-size: 14px; background-color: transparent; padding-top: 10px">                                           
+																<?php 
+																$weekend_getaway = $deal_data['Weekend Getaway'];
+																$stops = $deal_data['Direct Flight'];
+																
+														
+																if ( $stops ) {
+																	switch ( $stops ) {
+																		case 'direct':
+																			$stops_text = 'Direct Flight';
+																			break;
+													
+																		case '1stop':
+																			$stops_text = '1 Stop';
+																			break;
+													
+																		case '2stops':
+																			$stops_text = '2 Stops';
+																			break;
+																		
+																		default:
+																			$stops_text = '';
+																			break;
+																	}
+													
+																	if ( $stops_text ) {
+																		echo '<span class="badge" style="">';
+																			echo $stops_text;
+																		echo '</span>';
+																	}
+																}
+													
+																if ( $weekend_getaway == 'yes' ) {
+																	echo '<span class="badge" style="padding-left: 10px;">';
+																		echo 'Weekend Getaway';
+																	echo '</span>';
+																}
+																?>
 															</td>
 														</tr>
 													</table>
@@ -184,9 +237,9 @@ class TFC_Email {
 											</tr>
 
 
-
+											<!-- Price and button -->
 											<tr>
-												<td class="pricepad" style="padding: 14px 0 0 0; margin: 0; background-color:transparent;">
+												<td class="pricepad" style="padding: 14px 0 10px 0; margin: 0; background-color:transparent;">
 													<table border="0" cellpadding="0" cellspacing="0" role="presentation" style="border-spacing:0;">
 														<tr>
 															<td style="font-size: 16px; color: #415BE7; font-family: 'Inter', Arial, sans-serif; padding: 0 10px 0 0; font-weight: bold; border: 0;">

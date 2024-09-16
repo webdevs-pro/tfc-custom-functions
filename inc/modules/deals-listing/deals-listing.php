@@ -100,15 +100,11 @@ class TFC_Deals_Listing {
 
 
 	private function render_become_a_member_button( $post_id ) {
-		// $this->render_deal_dates( $post_id );
-
 		echo '<a class="tfc-loop-subscribe" href="/signup" role="button">Become a Free Member</a>';
 	}
 
 
 	private function render_become_a_premium_member_button( $post_id ) {
-		// $this->render_deal_dates( $post_id );
-		
 		echo '<a class="tfc-loop-subscribe" href="/subscribe" role="button">Become a Premium Member</a>';
 	}
 
@@ -122,8 +118,6 @@ class TFC_Deals_Listing {
 		$date_format = 'j M';
 		echo '<p class="tfc-loop-deal-dates">' . date_i18n( $date_format, $outbound_timestamp ) . ' - ' . date_i18n( $date_format, $return_timestamp ) . '</p>';
 	}
-
-
 
 	public function deals_listing_item_image() {
 		$post_id = get_the_ID();

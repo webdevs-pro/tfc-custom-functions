@@ -68,6 +68,17 @@
          .darkmode-transparent {
             background-color: #fff;
          }
+         
+         .badge {
+            background-color: #3d3d3d;
+            color: #ebebeb;
+            font-size: 11px;
+            border-radius: 5px;
+            padding: 4px 7px;
+            line-height: 1;
+            margin-right: 10px;
+            display: inline-block;
+         }
 
          @media (prefers-color-scheme: dark) {
             body, center, table .darkmode-bg {
@@ -81,13 +92,17 @@
                color: #ffffff !important;
             }
             [data-ogsc] .darkmode-transparent {
-               background-color: transparent !important;
-            }
-         }
-         @media (prefers-color-scheme: dark) {
-            [data-ogsc] .darkmode-transparent {
                background-color: #fff !important;
             }
+
+            .badge {
+               background-color: #ebebeb;
+               color: #3d3d3d;
+            }
+         }
+         [data-ogsc] .badge {
+            background-color: #ebebeb;
+            color: #3d3d3d;
          }
 
          @media only screen and (max-width:600px) {
