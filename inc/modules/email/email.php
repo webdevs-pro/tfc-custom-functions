@@ -100,6 +100,13 @@ class TFC_Email {
 
 
 	private function get_table_row( $index, $deal_data, $button_type ) {
+		if ( $button_type == 'link_to_deal' ) {
+			$link = $deal_data['Skyscanner Deal Link'];
+		} else if ( $button_type == 'subscribe_button' ) {
+			$link = 'https://tomsflightclub.com/subscribe/';
+		} else {
+			$link = '#';
+		}
 		?>
 
 		<tr>
@@ -120,7 +127,7 @@ class TFC_Email {
 													<?php
 														$alt_text = $deal_data['Origin City'] . ' to ' . $deal_data['Destination City'] . ' flight for ' . ( new DateTime( $deal_data['Date'] ) )->format( 'F' );
 													?>
-													<a href="https://tomsflightclub.com/" target="_blank">
+													<a href="<?php echo esc_url( $link ); ?>" target="_blank">
 														<img class="imgsize" src="<?php echo esc_url( $deal_data['Deal City Image'] ); ?>" alt="<?php echo sanitize_text_field( $alt_text ); ?>" width="220" style="border:0;width:100%;max-width:220px;height:auto;display:block; border-radius: 10px;">
 													</a>
 												</td>
@@ -253,11 +260,11 @@ class TFC_Email {
 															</td>
 															<td align="center" style="border-radius:10px; font-size: 20px;background-color: #415BE7;" bgcolor="#415BE7" >
 																<?php if ( $button_type == 'link_to_deal' ) { ?>
-																	<a href="<?php echo esc_url( $deal_data['Skyscanner Deal Link'] ); ?>" target="_blank" style="font-size: 14px;font-weight: normal;text-decoration: none;color: #ffffff;background-color: #415BE7;border:1px solid #263EC4;border-radius:10px;padding:10px 18px;display: inline-block; font-family: 'Inter', Arial, sans-serif;">
+																	<a href="<?php echo esc_url( $link ); ?>" target="_blank" style="font-size: 14px;font-weight: normal;text-decoration: none;color: #ffffff;background-color: #415BE7;border:1px solid #263EC4;border-radius:10px;padding:10px 18px;display: inline-block; font-family: 'Inter', Arial, sans-serif;">
 																		Get Deal
 																	</a>
 																<?php } else if ( $button_type == 'subscribe_button' ) { ?>
-																	<a href="https://tomsflightclub.com/subscribe/" target="_blank" style="font-size: 14px;font-weight: normal;text-decoration: none;color: #ffffff;background-color: #415BE7;border:1px solid #263EC4;border-radius:10px;padding:10px 18px;display: inline-block; font-family: 'Inter', Arial, sans-serif;">
+																	<a href="<?php echo esc_url( $link ); ?>" target="_blank" style="font-size: 14px;font-weight: normal;text-decoration: none;color: #ffffff;background-color: #415BE7;border:1px solid #263EC4;border-radius:10px;padding:10px 18px;display: inline-block; font-family: 'Inter', Arial, sans-serif;">
 																		Become a Premium Member
 																	</a>
 																<?php } ?>
