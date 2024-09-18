@@ -153,9 +153,9 @@ class TFC_Deals_Listing {
 		
 		ob_start();
 
-			echo '<div class="deal-thumbnail">';
+			echo '<a href="#" class="deal-thumbnail">';
 				echo wp_get_attachment_image( $image_id, 'large' );
-			echo '</div>';
+			echo '</a>';
 
 			?>
 			<style>

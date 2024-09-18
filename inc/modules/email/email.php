@@ -183,7 +183,7 @@ class TFC_Email {
 																	<span style="vertical-align: middle;" >
 																	<?php if ( $button_type == 'link_to_deal' ) {
 																	$outbound_date = $deal_data['Outbound Date'];
-																	$return_date = $deal_data['Outbound Day'];
+																	$return_date = $deal_data['Return Date'];
 
 																	$outbound_timestamp = strtotime( $outbound_date );
 																	$return_timestamp = strtotime( $return_date );
